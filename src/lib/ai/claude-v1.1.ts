@@ -22,6 +22,36 @@ function getClient(): Anthropic {
 }
 
 const MODEL = 'claude-sonnet-4-20250514';
+const MAX_RETRIES = 3;
+
+async function callWithRetry(
+  fn: () => Promise<Anthropic.Message>,
+  retries = MAX_RETRIES
+): Promise<Anthropic.Message> {
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      return await fn();
+    } catch (err: unknown) {
+      const isRetryable =
+        err instanceof Error &&
+        (err.message.includes('529') ||
+         err.message.includes('overloaded') ||
+         err.message.includes('rate_limit') ||
+         err.message.includes('500') ||
+         err.message.includes('503'));
+
+      if (!isRetryable || attempt === retries) {
+        throw err;
+      }
+
+      // Exponential backoff: 2s, 4s, 8s
+      const delay = Math.pow(2, attempt + 1) * 1000;
+      console.log(`Anthropic API retry ${attempt + 1}/${retries} after ${delay}ms...`);
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+  }
+  throw new Error('Unreachable');
+}
 
 function extractJSON(text: string): string {
   const codeBlockMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/);
@@ -40,11 +70,13 @@ export async function generateDailyDigestV2(
   const prompt = buildDigestPromptV2(data, languageMode);
 
   const anthropic = getClient();
-  const message = await anthropic.messages.create({
-    model: MODEL,
-    max_tokens: 7000, // larger for v1.1's richer content + quick versions
-    messages: [{ role: 'user', content: prompt }],
-  });
+  const message = await callWithRetry(() =>
+    anthropic.messages.create({
+      model: MODEL,
+      max_tokens: 7000,
+      messages: [{ role: 'user', content: prompt }],
+    })
+  );
 
   const responseText = message.content[0].type === 'text' ? message.content[0].text : '';
   const parsed = JSON.parse(extractJSON(responseText));
@@ -84,11 +116,13 @@ export async function generateDrillDownV2(
   const prompt = buildDrillDownPromptV2(blurbSummary, blurbSport, languageMode);
 
   const anthropic = getClient();
-  const message = await anthropic.messages.create({
-    model: MODEL,
-    max_tokens: 4000,
-    messages: [{ role: 'user', content: prompt }],
-  });
+  const message = await callWithRetry(() =>
+    anthropic.messages.create({
+      model: MODEL,
+      max_tokens: 4000,
+      messages: [{ role: 'user', content: prompt }],
+    })
+  );
 
   const responseText = message.content[0].type === 'text' ? message.content[0].text : '';
   const parsed = JSON.parse(extractJSON(responseText));
@@ -115,11 +149,13 @@ export async function generateQuizV2(
   const prompt = buildQuizPromptV2(blurbs);
 
   const anthropic = getClient();
-  const message = await anthropic.messages.create({
-    model: MODEL,
-    max_tokens: 3000,
-    messages: [{ role: 'user', content: prompt }],
-  });
+  const message = await callWithRetry(() =>
+    anthropic.messages.create({
+      model: MODEL,
+      max_tokens: 3000,
+      messages: [{ role: 'user', content: prompt }],
+    })
+  );
 
   const responseText = message.content[0].type === 'text' ? message.content[0].text : '';
   const parsed = JSON.parse(extractJSON(responseText));

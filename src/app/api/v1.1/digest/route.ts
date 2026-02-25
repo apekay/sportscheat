@@ -3,6 +3,9 @@ import { aggregateSportsData } from '@/lib/data/aggregate-v1.1';
 import { generateDailyDigestV2 } from '@/lib/ai/claude-v1.1';
 import { LanguageMode } from '@/types/v1.1';
 
+// Allow up to 60s for data fetch + Claude API call (with retries)
+export const maxDuration = 60;
+
 // GET /api/v1.1/digest — returns today's story-first digest
 export async function GET(request: Request) {
   try {
