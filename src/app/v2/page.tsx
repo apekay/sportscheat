@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Newspaper, Layers } from 'lucide-react';
+import { AdBanner } from '@/components/ads/AdBanner';
 
 export default function V2Picker() {
   const router = useRouter();
@@ -84,7 +85,11 @@ export default function V2Picker() {
         </button>
       </div>
 
-      <p className="mt-8 text-xs text-gray-400 text-center">
+      <div className="w-full max-w-lg mt-6">
+        <AdBanner />
+      </div>
+
+      <p className="mt-4 text-xs text-gray-400 text-center">
         You can switch anytime from the header.
       </p>
     </div>

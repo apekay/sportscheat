@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { DailyDigestV2 } from '@/types/v1.1';
 import { V2Header } from '@/components/v2/V2Header';
 import { BoldLayout } from '@/components/v2/BoldLayout';
+import { AdBanner } from '@/components/ads/AdBanner';
 import { Loader2 } from 'lucide-react';
 
 export default function BoldPage() {
@@ -82,11 +83,14 @@ export default function BoldPage() {
         {digest && <BoldLayout digest={digest} spoilerFree={spoilerFree} />}
 
         {digest && (
-          <div className="mt-8 py-6 text-center">
-            <p className="text-xs text-gray-400">
-              You don&apos;t need to be a fan to belong in the conversation.
-            </p>
-          </div>
+          <>
+            <AdBanner className="mt-6" />
+            <div className="mt-4 py-6 text-center">
+              <p className="text-xs text-gray-400">
+                You don&apos;t need to be a fan to belong in the conversation.
+              </p>
+            </div>
+          </>
         )}
       </main>
     </div>

@@ -4,6 +4,7 @@ import { useState, useCallback } from 'react';
 import { DailyDigestV2 } from '@/types/v1.1';
 import { SwipeCard } from './SwipeCard';
 import { ProgressDots } from './ProgressDots';
+import { AdBanner } from '@/components/ads/AdBanner';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface SwipeStackProps {
@@ -95,6 +96,9 @@ export function SwipeStack({ digest, spoilerFree }: SwipeStackProps) {
             <ChevronRight className="h-5 w-5" />
           </button>
         </div>
+
+        {/* Ad below navigation */}
+        <AdBanner />
       </div>
     </div>
   );
