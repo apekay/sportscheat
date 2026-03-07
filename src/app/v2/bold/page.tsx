@@ -5,6 +5,7 @@ import { DailyDigestV2 } from '@/types/v1.1';
 import { V2Header } from '@/components/v2/V2Header';
 import { BoldLayout } from '@/components/v2/BoldLayout';
 import { AdBanner } from '@/components/ads/AdBanner';
+import { trackDigestLoaded, trackDigestRefreshed } from '@/lib/analytics/gtag';
 import { Loader2 } from 'lucide-react';
 
 export default function BoldPage() {
@@ -19,7 +20,9 @@ export default function BoldPage() {
     try {
       const res = await fetch('/api/v2/digest');
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      setDigest(await res.json());
+      const data = await res.json();
+      setDigest(data);
+      trackDigestLoaded(data.blurbs?.length ?? 0);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load');
     } finally {
@@ -38,7 +41,10 @@ export default function BoldPage() {
         return;
       }
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      setDigest(await res.json());
+      const data = await res.json();
+      setDigest(data);
+      trackDigestRefreshed();
+      trackDigestLoaded(data.blurbs?.length ?? 0);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to refresh');
     } finally {

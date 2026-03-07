@@ -5,6 +5,7 @@ import { DailyDigestV2 } from '@/types/v1.1';
 import { V2Header } from '@/components/v2/V2Header';
 import { SwipeStack } from '@/components/v2/SwipeStack';
 import { Loader2 } from 'lucide-react';
+import { trackDigestLoaded, trackDigestRefreshed } from '@/lib/analytics/gtag';
 
 export default function SwipePage() {
   const [digest, setDigest] = useState<DailyDigestV2 | null>(null);
@@ -18,7 +19,9 @@ export default function SwipePage() {
     try {
       const res = await fetch('/api/v2/digest');
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      setDigest(await res.json());
+      const data = await res.json();
+      setDigest(data);
+      trackDigestLoaded(data.blurbs?.length ?? 0);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load');
     } finally {
@@ -37,7 +40,10 @@ export default function SwipePage() {
         return;
       }
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      setDigest(await res.json());
+      const data = await res.json();
+      setDigest(data);
+      trackDigestRefreshed();
+      trackDigestLoaded(data.blurbs?.length ?? 0);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to refresh');
     } finally {

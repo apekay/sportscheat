@@ -5,6 +5,7 @@ import { StoryBlurb } from '@/types/v1.1';
 import { sportLabel, sportColor, sportEmoji } from '@/lib/utils-v1.1';
 import { cn } from '@/lib/utils';
 import { RotateCcw, MessageCircle, Check } from 'lucide-react';
+import { trackCardEngaged, trackStoryMemorized } from '@/lib/analytics/gtag';
 
 interface SwipeCardProps {
   blurb: StoryBlurb;
@@ -78,7 +79,10 @@ export function SwipeCard({
 
           {/* Tap to flip prompt */}
           <button
-            onClick={() => setFlipped(true)}
+            onClick={() => {
+              setFlipped(true);
+              trackCardEngaged(blurb.id, blurb.sport);
+            }}
             className="w-full rounded-xl bg-gray-900 py-3 text-sm font-semibold text-white hover:bg-gray-800 transition-colors"
           >
             Tap for full story
@@ -152,6 +156,7 @@ export function SwipeCard({
             <button
               onClick={() => {
                 onMarkKnown();
+                trackStoryMemorized(blurb.id, blurb.sport);
                 setFlipped(false);
                 onNext();
               }}

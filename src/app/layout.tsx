@@ -14,6 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 const adsenseClient = process.env.NEXT_PUBLIC_ADSENSE_CLIENT;
+const googleAdsId = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID;
 
 export const metadata: Metadata = {
   title: "Sporting Chance — Your Daily Sports Briefing",
@@ -37,6 +38,28 @@ export default function RootLayout({
             crossOrigin="anonymous"
             strategy="afterInteractive"
           />
+        )}
+        {googleAdsId && (
+          <>
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${googleAdsId}`}
+              strategy="afterInteractive"
+            />
+            <Script
+              id="gtag-init"
+              strategy="afterInteractive"
+              dangerouslySetInnerHTML={{
+                __html: `
+                  window.dataLayer = window.dataLayer || [];
+                  function gtag(){dataLayer.push(arguments);}
+                  gtag('js', new Date());
+                  gtag('config', '${googleAdsId}', {
+                    send_page_view: true
+                  });
+                `,
+              }}
+            />
+          </>
         )}
       </body>
     </html>

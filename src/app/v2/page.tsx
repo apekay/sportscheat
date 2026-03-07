@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Newspaper, Layers } from 'lucide-react';
 import { AdBanner } from '@/components/ads/AdBanner';
+import { trackViewModeSelected } from '@/lib/analytics/gtag';
 
 export default function V2Picker() {
   const router = useRouter();
@@ -17,6 +18,7 @@ export default function V2Picker() {
 
   const selectView = (view: 'bold' | 'swipe') => {
     localStorage.setItem('sporting-chance-view', view);
+    trackViewModeSelected(view);
     router.push(`/v2/${view}`);
   };
 
