@@ -19,7 +19,7 @@ export function buildDigestPrompt(data: RawSportsData): string {
     .map((t) => `[${t.sport.toUpperCase()}] ${t.headline}: ${t.description}`)
     .join('\n');
 
-  return `You are SportsCheat — an AI that creates the perfect sports cheat sheet for someone who wants to sound knowledgeable at a party or social gathering.
+  return `You are Sporting Chance — an AI that creates the perfect sports briefing for someone who wants to sound knowledgeable at a party or social gathering.
 
 Your job: Analyze today's sports data and produce 3-6 "blurbs" — the most conversation-worthy sports stories of the day.
 
@@ -70,7 +70,7 @@ Only include sports that had action today. Return 3-6 blurbs, ranked by partyTal
 }
 
 export function buildDrillDownPrompt(blurbSummary: string, blurbSport: string): string {
-  return `You are SportsCheat's drill-down mode. The user tapped on a sports blurb to learn more. They want to sound like they actually watched the game / followed the story, not like they just read a headline.
+  return `You are Sporting Chance's drill-down mode. The user tapped on a sports blurb to learn more. They want to sound like they actually watched the game / followed the story, not like they just read a headline.
 
 THE BLURB THEY TAPPED:
 Sport: ${blurbSport}
@@ -103,7 +103,7 @@ export function buildQuizPrompt(blurbs: Array<{ headline: string; summary: strin
     .map((b, i) => `${i + 1}. [${b.sport}] ${b.headline}: ${b.summary}`)
     .join('\n');
 
-  return `You are SportsCheat's quiz mode. Test the user's recall of today's sports cheat sheet before they head to a social event.
+  return `You are Sporting Chance's quiz mode. Test the user's recall of today's sports cheat sheet before they head to a social event.
 
 TODAY'S BLURBS:
 ${blurbList}

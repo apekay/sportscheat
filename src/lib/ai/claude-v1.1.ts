@@ -14,9 +14,9 @@ import { RawSportsDataV2 } from '@/lib/data/aggregate-v1.1';
 import { generateId, todayString } from '@/lib/utils';
 
 function getClient(): Anthropic {
-  const apiKey = process.env.SPORTSCHEAT_ANTHROPIC_KEY || process.env.ANTHROPIC_API_KEY;
+  const apiKey = process.env.SPORTING_CHANCE_ANTHROPIC_KEY || process.env.SPORTSCHEAT_ANTHROPIC_KEY || process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
-    throw new Error('Missing API key. Set SPORTSCHEAT_ANTHROPIC_KEY in .env.local');
+    throw new Error('Missing API key. Set SPORTING_CHANCE_ANTHROPIC_KEY in .env.local');
   }
   return new Anthropic({ apiKey });
 }

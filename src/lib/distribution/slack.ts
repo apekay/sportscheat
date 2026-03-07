@@ -9,7 +9,7 @@ export async function sendSlack(webhookUrl: string, digest: DailyDigestV2): Prom
   const blocks = [
     {
       type: 'header',
-      text: { type: 'plain_text', text: `SportsCheat — ${digest.date}` },
+      text: { type: 'plain_text', text: `Sporting Chance — ${digest.date}` },
     },
     {
       type: 'section',

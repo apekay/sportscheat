@@ -3,7 +3,7 @@ import { sportEmoji } from '@/lib/utils-v1.1';
 
 export async function sendEmail(email: string, digest: DailyDigestV2): Promise<void> {
   const apiKey = process.env.RESEND_API_KEY;
-  const fromEmail = process.env.RESEND_FROM_EMAIL || 'digest@sportscheat.app';
+  const fromEmail = process.env.RESEND_FROM_EMAIL || 'digest@sportingchance.app';
 
   if (!apiKey) {
     throw new Error('Missing RESEND_API_KEY');
@@ -33,8 +33,8 @@ export async function sendEmail(email: string, digest: DailyDigestV2): Promise<v
   const html = `
     <div style="max-width: 600px; margin: 0 auto; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">
       <div style="padding: 24px; background: #111827; border-radius: 12px 12px 0 0; color: white;">
-        <h1 style="margin: 0; font-size: 20px;">SportsCheat</h1>
-        <p style="margin: 4px 0 0; font-size: 13px; color: #9ca3af;">${digest.date} — Your daily cheat sheet</p>
+        <h1 style="margin: 0; font-size: 20px;">Sporting Chance</h1>
+        <p style="margin: 4px 0 0; font-size: 13px; color: #9ca3af;">${digest.date} — Your daily sports briefing</p>
       </div>
 
       <div style="padding: 20px; background: #111827; border-radius: 0; color: white;">
@@ -63,7 +63,7 @@ export async function sendEmail(email: string, digest: DailyDigestV2): Promise<v
   await resend.emails.send({
     from: fromEmail,
     to: email,
-    subject: `SportsCheat: ${digest.headlineStory.slice(0, 60)}...`,
+    subject: `Sporting Chance: ${digest.headlineStory.slice(0, 60)}...`,
     html,
   });
 

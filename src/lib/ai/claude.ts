@@ -4,12 +4,12 @@ import { buildDigestPrompt, buildDrillDownPrompt, buildQuizPrompt } from './prom
 import { generateId, todayString } from '@/lib/utils';
 
 // Lazy-initialize the client so env vars are available at call time
-// Uses SPORTSCHEAT_ANTHROPIC_KEY to avoid conflict with system-level ANTHROPIC_API_KEY
+// Uses SPORTING_CHANCE_ANTHROPIC_KEY to avoid conflict with system-level ANTHROPIC_API_KEY
 function getClient(): Anthropic {
-  const apiKey = process.env.SPORTSCHEAT_ANTHROPIC_KEY || process.env.ANTHROPIC_API_KEY;
+  const apiKey = process.env.SPORTING_CHANCE_ANTHROPIC_KEY || process.env.SPORTSCHEAT_ANTHROPIC_KEY || process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
     throw new Error(
-      'Missing API key. Set SPORTSCHEAT_ANTHROPIC_KEY in .env.local'
+      'Missing API key. Set SPORTING_CHANCE_ANTHROPIC_KEY in .env.local'
     );
   }
   return new Anthropic({ apiKey });

@@ -53,7 +53,7 @@ export default function HomeV2() {
       <header className="sticky top-0 z-10 border-b border-gray-200 bg-white/80 backdrop-blur-sm">
         <div className="mx-auto flex max-w-2xl items-center justify-between px-4 py-3">
           <div className="flex items-center gap-2">
-            <span className="text-xl font-bold text-gray-900">SportsCheat</span>
+            <span className="text-xl font-bold text-gray-900">Sporting Chance</span>
             <span className="rounded-full bg-indigo-100 px-2 py-0.5 text-xs text-indigo-600 font-medium">
               v1.1
             </span>

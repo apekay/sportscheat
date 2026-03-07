@@ -1,5 +1,5 @@
 // ============================================
-// Core domain types for SportsCheat
+// Core domain types for Sporting Chance
 // ============================================
 
 export type Sport = 'nfl' | 'nba' | 'mlb' | 'nhl' | 'ncaaf' | 'ncaab';

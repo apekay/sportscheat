@@ -15,7 +15,7 @@ export async function sendSMS(phone: string, digest: DailyDigestV2): Promise<voi
     .slice(0, 3);
 
   const lines = [
-    `SportsCheat ${digest.date}`,
+    `Sporting Chance ${digest.date}`,
     '',
     digest.headlineStory,
     '',

@@ -1,5 +1,5 @@
 // ============================================
-// SportsCheat v2.0 — Multi-Channel, Auto-Generated
+// Sporting Chance v2.0 — Multi-Channel, Auto-Generated
 // Extends v1.1 types with storage + distribution
 // ============================================
 

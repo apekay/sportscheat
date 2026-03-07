@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 const adsenseClient = process.env.NEXT_PUBLIC_ADSENSE_CLIENT;
 
 export const metadata: Metadata = {
-  title: "SportsCheat — Your Daily Sports Cheat Sheet",
+  title: "Sporting Chance — Your Daily Sports Briefing",
   description: "Everything you need to sound like a sports fan, in 3 minutes.",
 };
 

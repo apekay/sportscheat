@@ -39,7 +39,7 @@ export default function Home() {
         <div className="mx-auto flex max-w-2xl items-center justify-between px-4 py-3">
           <div className="flex items-center gap-2">
             <span className="text-xl font-bold text-gray-900">
-              SportsCheat
+              Sporting Chance
             </span>
             <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-500">
               beta

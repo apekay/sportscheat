@@ -1,5 +1,5 @@
 // ============================================
-// SportsCheat v1.1 — "The Curious Outsider"
+// Sporting Chance v1.1 — "The Curious Outsider"
 // Extended types for story-first, non-fan-friendly experience
 // ============================================
 

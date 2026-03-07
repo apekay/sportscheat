@@ -10,20 +10,20 @@ export default function V2Picker() {
 
   // Auto-redirect if user already chose a preference
   useEffect(() => {
-    const pref = localStorage.getItem('sportscheat-view');
+    const pref = localStorage.getItem('sporting-chance-view');
     if (pref === 'bold') router.replace('/v2/bold');
     if (pref === 'swipe') router.replace('/v2/swipe');
   }, [router]);
 
   const selectView = (view: 'bold' | 'swipe') => {
-    localStorage.setItem('sportscheat-view', view);
+    localStorage.setItem('sporting-chance-view', view);
     router.push(`/v2/${view}`);
   };
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center px-4">
       <div className="text-center mb-10">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">SportsCheat</h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Sporting Chance</h1>
         <p className="text-sm text-gray-500">
           Pick how you want to read your daily cheat sheet
         </p>

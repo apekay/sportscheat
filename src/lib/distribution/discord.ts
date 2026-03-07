@@ -14,7 +14,7 @@ export async function sendDiscord(webhookUrl: string, digest: DailyDigestV2): Pr
 
   const embeds = [
     {
-      title: `SportsCheat — ${digest.date}`,
+      title: `Sporting Chance — ${digest.date}`,
       description: `**If you only remember one thing:**\n${digest.headlineStory}`,
       fields,
       color: 0x111827,

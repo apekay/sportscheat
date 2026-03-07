@@ -22,7 +22,7 @@ export function V2Header({
       <div className="mx-auto flex max-w-2xl items-center justify-between px-4 py-3">
         <div className="flex items-center gap-2">
           <a href="/v2" className="text-xl font-bold text-gray-900">
-            SportsCheat
+            Sporting Chance
           </a>
           <span className="rounded-full bg-gray-900 px-2 py-0.5 text-xs text-white font-medium">
             v2
