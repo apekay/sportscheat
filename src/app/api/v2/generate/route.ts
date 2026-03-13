@@ -4,8 +4,8 @@ import { generateDailyDigestV2 } from '@/lib/ai/claude-v1.1';
 import { saveDigest } from '@/lib/storage/kv';
 import { todayString } from '@/lib/utils';
 
-// Allow up to 60s for data fetch + Claude API call
-export const maxDuration = 60;
+// Allow up to 300s for data fetch + Claude API call (requires Vercel Pro)
+export const maxDuration = 300;
 
 // GET /api/v2/generate — cron-triggered daily digest generation
 export async function GET(request: Request) {

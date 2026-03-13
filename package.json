@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.78.0",
+    "@auth/supabase-adapter": "^1.11.1",
     "@supabase/supabase-js": "^2.97.0",
     "@upstash/redis": "^1.36.3",
     "clsx": "^2.1.1",
@@ -17,10 +18,12 @@
     "lucide-react": "^0.575.0",
     "next": "16.1.6",
     "next-auth": "^4.24.13",
+    "nodemailer": "^7.0.13",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "resend": "^6.9.3",
     "rss-parser": "^3.13.0",
+    "stripe": "^20.4.1",
     "tailwind-merge": "^3.5.0",
     "twilio": "^5.12.2"
   },
