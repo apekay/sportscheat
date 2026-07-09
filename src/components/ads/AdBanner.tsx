@@ -18,7 +18,7 @@ export function AdBanner({
 }: AdBannerProps) {
   if (variant === 'sticky-bottom') {
     return (
-      <div className={`fixed bottom-0 left-0 right-0 z-20 bg-white/95 backdrop-blur-sm border-t border-gray-200 px-4 py-2 ${className}`}>
+      <div className={`fixed bottom-0 left-0 right-0 z-20 bg-warm-white/95 backdrop-blur-sm border-t border-warm-100 px-4 py-2 ${className}`}>
         <div className="mx-auto max-w-2xl">
           <AdUnit slot={slot} format="horizontal" />
         </div>

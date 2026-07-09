@@ -87,7 +87,7 @@ export function V2Header({
           ) : (
             <Link
               href="/pricing"
-              className="flex h-7 w-7 items-center justify-center rounded-full bg-editorial text-white text-xs font-bold"
+              className="flex h-7 w-7 items-center justify-center rounded-full bg-editorial text-on-accent text-xs font-bold"
               title="Account"
             >
               {session.user?.name?.[0]?.toUpperCase() || session.user?.email?.[0]?.toUpperCase() || 'U'}

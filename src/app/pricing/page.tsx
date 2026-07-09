@@ -134,7 +134,7 @@ export default function PricingPage() {
               <button
                 onClick={() => handleSubscribe('monthly')}
                 disabled={!!loading}
-                className="w-full flex items-center justify-center gap-2 rounded-xl bg-warm-900 py-3 text-sm font-semibold text-white hover:bg-warm-700 disabled:opacity-50 transition-colors"
+                className="w-full flex items-center justify-center gap-2 rounded-xl bg-warm-900 py-3 text-sm font-semibold text-on-ink hover:bg-warm-700 disabled:opacity-50 transition-colors"
               >
                 {loading === 'monthly' ? (
                   <Loader2 className="h-4 w-4 animate-spin" />

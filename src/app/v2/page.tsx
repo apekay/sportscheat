@@ -43,7 +43,7 @@ export default function V2Picker() {
         >
           <div className="flex items-center gap-3 mb-4">
             <div className="rounded-xl bg-warm-900 p-2.5">
-              <Newspaper className="h-6 w-6 text-white" />
+              <Newspaper className="h-6 w-6 text-on-ink" />
             </div>
             <h2 className="text-lg font-serif font-bold text-warm-900">Headlines</h2>
           </div>
@@ -68,7 +68,7 @@ export default function V2Picker() {
         >
           <div className="flex items-center gap-3 mb-4">
             <div className="rounded-xl bg-editorial p-2.5">
-              <Layers className="h-6 w-6 text-white" />
+              <Layers className="h-6 w-6 text-on-accent" />
             </div>
             <h2 className="text-lg font-serif font-bold text-warm-900">Flash Cards</h2>
           </div>

@@ -35,7 +35,7 @@ export default function SignInPage() {
           {/* Google */}
           <button
             onClick={() => signIn('google', { callbackUrl: '/v2' })}
-            className="flex w-full items-center justify-center gap-3 rounded-xl bg-warm-900 py-3 text-sm font-semibold text-white hover:bg-warm-700 transition-colors"
+            className="flex w-full items-center justify-center gap-3 rounded-xl bg-warm-900 py-3 text-sm font-semibold text-on-ink hover:bg-warm-700 transition-colors"
           >
             <svg className="h-5 w-5" viewBox="0 0 24 24">
               <path
@@ -97,7 +97,7 @@ export default function SignInPage() {
               <button
                 type="submit"
                 disabled={loading || !email}
-                className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-editorial py-3 text-sm font-semibold text-white hover:bg-editorial-dark disabled:opacity-50 transition-colors"
+                className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-editorial py-3 text-sm font-semibold text-on-accent hover:bg-editorial-dark disabled:opacity-50 transition-colors"
               >
                 {loading ? (
                   <Loader2 className="h-4 w-4 animate-spin" />

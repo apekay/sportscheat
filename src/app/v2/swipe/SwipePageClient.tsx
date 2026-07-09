@@ -117,7 +117,7 @@ export default function SwipePageClient({ initialDigest }: Props) {
                     alert('Link copied!');
                   }
                 }}
-                className="inline-flex items-center gap-2 rounded-xl bg-warm-900 px-5 py-2.5 text-sm font-semibold text-white hover:bg-warm-700 transition-colors"
+                className="inline-flex items-center gap-2 rounded-xl bg-warm-900 px-5 py-2.5 text-sm font-semibold text-on-ink hover:bg-warm-700 transition-colors"
               >
                 Share the cheat code
               </button>
