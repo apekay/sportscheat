@@ -63,17 +63,23 @@ export async function fetchESPNScoreboard(sport: Sport, date?: string): Promise<
     if (!res.ok) throw new Error(`ESPN API error: ${res.status}`);
 
     const data: ESPNScoreboard = await res.json();
-    return data.events.map((event) => parseESPNEvent(event, sport));
+    return data.events
+      .map((event) => parseESPNEvent(event, sport))
+      .filter((e): e is SportEvent => e !== null);
   } catch (error) {
     console.error(`Failed to fetch ESPN ${sport} scoreboard:`, error);
     return [];
   }
 }
 
-function parseESPNEvent(event: ESPNEvent, sport: Sport): SportEvent {
-  const comp = event.competitions[0];
-  const home = comp.competitors.find((c) => c.homeAway === 'home')!;
-  const away = comp.competitors.find((c) => c.homeAway === 'away')!;
+function parseESPNEvent(event: ESPNEvent, sport: Sport): SportEvent | null {
+  // Some events (notably tennis groupings) come back without competitions
+  // or without home/away competitors — skip those rather than crash the sport.
+  const comp = event.competitions?.[0];
+  if (!comp?.competitors) return null;
+  const home = comp.competitors.find((c) => c.homeAway === 'home');
+  const away = comp.competitors.find((c) => c.homeAway === 'away');
+  if (!home || !away) return null;
 
   const statusState = event.status.type.state;
   let status: SportEvent['status'] = 'scheduled';
