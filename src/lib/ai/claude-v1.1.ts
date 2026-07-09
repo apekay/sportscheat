@@ -21,13 +21,38 @@ function getClient(): Anthropic {
   return new Anthropic({ apiKey });
 }
 
-const MODEL = 'claude-sonnet-4-20250514';
+const MODEL = 'claude-fable-5';
+// Fable's safety classifiers can decline benign requests; the server retries
+// them on Opus 4.8 inside the same call (server-side-fallback beta).
+const FALLBACK_MODEL = 'claude-opus-4-8';
 const MAX_RETRIES = 3;
 
+function createMessage(
+  anthropic: Anthropic,
+  prompt: string,
+  maxTokens: number
+): Promise<Anthropic.Beta.BetaMessage> {
+  return anthropic.beta.messages.create({
+    model: MODEL,
+    max_tokens: maxTokens,
+    betas: ['server-side-fallback-2026-06-01'],
+    fallbacks: [{ model: FALLBACK_MODEL }],
+    messages: [{ role: 'user', content: prompt }],
+  });
+}
+
+function getResponseText(message: Anthropic.Beta.BetaMessage): string {
+  if (message.stop_reason === 'refusal') {
+    throw new Error('Model declined the request (stop_reason: refusal)');
+  }
+  const block = message.content.find((b) => b.type === 'text');
+  return block?.text ?? '';
+}
+
 async function callWithRetry(
-  fn: () => Promise<Anthropic.Message>,
+  fn: () => Promise<Anthropic.Beta.BetaMessage>,
   retries = MAX_RETRIES
-): Promise<Anthropic.Message> {
+): Promise<Anthropic.Beta.BetaMessage> {
   for (let attempt = 0; attempt <= retries; attempt++) {
     try {
       return await fn();
@@ -70,16 +95,11 @@ export async function generateDailyDigestV2(
   const prompt = buildDigestPromptV2(data, languageMode);
 
   const anthropic = getClient();
-  const message = await callWithRetry(() =>
-    anthropic.messages.create({
-      model: MODEL,
-      max_tokens: 7000,
-      messages: [{ role: 'user', content: prompt }],
-    })
-  );
+  // Extra headroom over the old 7000: Fable's always-on thinking counts
+  // toward max_tokens.
+  const message = await callWithRetry(() => createMessage(anthropic, prompt, 16000));
 
-  const responseText = message.content[0].type === 'text' ? message.content[0].text : '';
-  const parsed = JSON.parse(extractJSON(responseText));
+  const parsed = JSON.parse(extractJSON(getResponseText(message)));
 
   return {
     id: generateId(),
@@ -116,16 +136,9 @@ export async function generateDrillDownV2(
   const prompt = buildDrillDownPromptV2(blurbSummary, blurbSport, languageMode);
 
   const anthropic = getClient();
-  const message = await callWithRetry(() =>
-    anthropic.messages.create({
-      model: MODEL,
-      max_tokens: 4000,
-      messages: [{ role: 'user', content: prompt }],
-    })
-  );
+  const message = await callWithRetry(() => createMessage(anthropic, prompt, 8000));
 
-  const responseText = message.content[0].type === 'text' ? message.content[0].text : '';
-  const parsed = JSON.parse(extractJSON(responseText));
+  const parsed = JSON.parse(extractJSON(getResponseText(message)));
 
   return {
     blurbId,
@@ -149,16 +162,9 @@ export async function generateQuizV2(
   const prompt = buildQuizPromptV2(blurbs);
 
   const anthropic = getClient();
-  const message = await callWithRetry(() =>
-    anthropic.messages.create({
-      model: MODEL,
-      max_tokens: 3000,
-      messages: [{ role: 'user', content: prompt }],
-    })
-  );
+  const message = await callWithRetry(() => createMessage(anthropic, prompt, 8000));
 
-  const responseText = message.content[0].type === 'text' ? message.content[0].text : '';
-  const parsed = JSON.parse(extractJSON(responseText));
+  const parsed = JSON.parse(extractJSON(getResponseText(message)));
 
   return (parsed.questions || []).map(
     (q: Record<string, unknown>, i: number) => ({
