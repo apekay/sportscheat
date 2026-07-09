@@ -74,7 +74,6 @@ export default function BoldPageClient({ initialDigest }: Props) {
         spoilerFree={spoilerFree}
         onRefresh={handleRefresh}
         onSpoilerToggle={() => setSpoilerFree(!spoilerFree)}
-        lastUpdated={digest?.generatedAt}
       />
 
       <main className="mx-auto max-w-2xl px-4 py-6">

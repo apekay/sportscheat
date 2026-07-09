@@ -34,10 +34,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    // suppressHydrationWarning: the pre-paint script below sets data-skin
+    // from localStorage, which the server can't know about
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${lora.variable} antialiased`}
       >
+        {/* Apply the saved reading skin before first paint. Plain script at
+            the top of body: renders identically on server and client, and
+            stays clear of the AdSense loader's head mutations. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{var s=localStorage.getItem('sc-skin');if(s)document.documentElement.dataset.skin=s}catch(e){}`,
+          }}
+        />
         <Script
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2115685134385061"
           crossOrigin="anonymous"

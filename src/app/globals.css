@@ -1,39 +1,219 @@
 @import "tailwindcss";
 
+/* ============================================================
+   Skin token system.
+   The default (no data-skin) is "Fast Read" — high contrast,
+   sans display, square corners, minimal ornament.
+   Skins override only these --sc-* tokens; components never
+   reference skin-specific values directly.
+   ============================================================ */
 :root {
-  --background: #FAF7F2;
-  --foreground: #2C2418;
+  /* grounds */
+  --sc-bg: #fbfaf7;
+  --sc-surface: #ffffff;
+  --sc-surface-2: #f3f1ea;
+  /* ink scale (darkest → faintest) */
+  --sc-ink: #191713;
+  --sc-ink-2: #57524a;
+  --sc-ink-3: #837d72;
+  --sc-ink-4: #a9a296;
+  /* rules + hairlines */
+  --sc-line: #e6e2d9;
+  --sc-line-2: #efece4;
+  /* accent */
+  --sc-accent: #c25e00;
+  --sc-accent-ink: #8a4300;
+  --sc-accent-soft: #faeede;
+  /* text on filled elements */
+  --sc-on-ink: #ffffff;
+  --sc-on-accent: #ffffff;
+  /* inverted (dark) surface — the back of flash cards */
+  --sc-invert-bg: #16140f;
+  --sc-invert-ink: #f4f2ec;
+  --sc-invert-ink-2: #c9c4b8;
+  --sc-invert-ink-3: #98938a;
+  --sc-invert-soft: rgba(255, 255, 255, 0.08);
+  --sc-invert-line: rgba(255, 255, 255, 0.16);
+  /* accent that stays legible on the inverted (dark) surface */
+  --sc-accent-invert: #e89a55;
+  /* shape */
+  --sc-radius: 2px;
+  --sc-border-w: 1px;
+  --sc-shadow: 0 1px 2px rgba(20, 18, 14, 0.07);
+  /* type */
+  --sc-font-display: var(--font-geist-sans), system-ui, sans-serif;
+  --sc-font-body: var(--font-geist-sans), system-ui, sans-serif;
+  --sc-display-case: none;
+  --sc-display-tracking: -0.015em;
+
+  --background: var(--sc-bg);
+  --foreground: var(--sc-ink);
+}
+
+/* ---------- 01 · Newsprint (The Sports Section) ---------- */
+[data-skin='newsprint'] {
+  --sc-bg: #faf7f0;
+  --sc-surface: #faf7f0;
+  --sc-surface-2: #f1ebdd;
+  --sc-ink: #1a1815;
+  --sc-ink-2: #443f35;
+  --sc-ink-3: #5c574c;
+  --sc-ink-4: #8a8375;
+  --sc-line: #1a1815;
+  --sc-line-2: #c8c1b0;
+  --sc-accent: #c42b1c;
+  --sc-accent-ink: #9b2114;
+  --sc-accent-soft: #f5e7de;
+  --sc-on-ink: #faf7f0;
+  --sc-on-accent: #faf7f0;
+  --sc-invert-bg: #1a1815;
+  --sc-invert-ink: #faf7f0;
+  --sc-invert-ink-2: #d9d2c2;
+  --sc-invert-ink-3: #a29a89;
+  --sc-accent-invert: #e06a5b;
+  --sc-radius: 0px;
+  --sc-shadow: none;
+  --sc-font-display: Georgia, 'Times New Roman', serif;
+  --sc-font-body: Georgia, 'Times New Roman', serif;
+  --sc-display-tracking: -0.01em;
+}
+
+/* ---------- 03 · Wire (press-wire terminal) ---------- */
+[data-skin='wire'] {
+  --sc-bg: #0b0e0c;
+  --sc-surface: #0f1411;
+  --sc-surface-2: #151c17;
+  --sc-ink: #eef3ee;
+  --sc-ink-2: #c9d2ca;
+  --sc-ink-3: #8b968c;
+  --sc-ink-4: #5f6a61;
+  --sc-line: #243027;
+  --sc-line-2: #1b241e;
+  --sc-accent: #33ff66;
+  --sc-accent-ink: #ffb000;
+  --sc-accent-soft: #12241a;
+  --sc-on-ink: #0b0e0c;
+  --sc-on-accent: #0b0e0c;
+  --sc-invert-bg: #000403;
+  --sc-invert-ink: #eef3ee;
+  --sc-invert-ink-2: #c9d2ca;
+  --sc-invert-ink-3: #8b968c;
+  --sc-invert-soft: rgba(51, 255, 102, 0.07);
+  --sc-invert-line: rgba(51, 255, 102, 0.2);
+  --sc-accent-invert: #33ff66;
+  --sc-radius: 0px;
+  --sc-shadow: none;
+  --sc-font-display: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  --sc-font-body: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  --sc-display-tracking: 0;
+}
+
+/* ---------- 04 · Jumbotron (broadcast brutalism) ---------- */
+[data-skin='jumbotron'] {
+  --sc-bg: #f2f2ef;
+  --sc-surface: #ffffff;
+  --sc-surface-2: #ededE6;
+  --sc-ink: #111111;
+  --sc-ink-2: #333331;
+  --sc-ink-3: #55554f;
+  --sc-ink-4: #8a8a83;
+  --sc-line: #111111;
+  --sc-line-2: #dcdcd4;
+  --sc-accent: #0033cc;
+  --sc-accent-ink: #002499;
+  --sc-accent-soft: #ffe886;
+  --sc-on-ink: #f2f2ef;
+  --sc-on-accent: #ffffff;
+  --sc-invert-bg: #111111;
+  --sc-invert-ink: #f2f2ef;
+  --sc-invert-ink-2: #d5d5cd;
+  --sc-invert-ink-3: #9d9d95;
+  --sc-accent-invert: #ffd100;
+  --sc-radius: 0px;
+  --sc-border-w: 3px;
+  --sc-shadow: 6px 6px 0 #111111;
+  --sc-font-display: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --sc-font-body: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --sc-display-case: uppercase;
+  --sc-display-tracking: -0.02em;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--sc-font-body);
   --font-mono: var(--font-geist-mono);
-  --font-serif: var(--font-lora);
+  --font-serif: var(--sc-font-display);
 
-  /* Warm editorial palette */
-  --color-cream: #FAF7F2;
-  --color-warm-white: #FFFDF9;
-  --color-warm-50: #F5F0E8;
-  --color-warm-100: #EDE5D8;
-  --color-warm-200: #DDD3C2;
-  --color-warm-300: #C4B8A5;
-  --color-warm-500: #8B7E6A;
-  --color-warm-700: #5C4F3C;
-  --color-warm-900: #2C2418;
+  /* Legacy palette names, now skin-driven */
+  --color-cream: var(--sc-bg);
+  --color-warm-white: var(--sc-surface);
+  --color-warm-50: var(--sc-surface-2);
+  --color-warm-100: var(--sc-line-2);
+  --color-warm-200: var(--sc-line);
+  --color-warm-300: var(--sc-ink-4);
+  --color-warm-400: var(--sc-ink-3);
+  --color-warm-500: var(--sc-ink-3);
+  --color-warm-600: var(--sc-ink-2);
+  --color-warm-700: var(--sc-ink-2);
+  --color-warm-900: var(--sc-ink);
 
-  /* Editorial accent (warm gold/amber) */
-  --color-editorial: #C7873A;
-  --color-editorial-light: #F5ECD7;
-  --color-editorial-dark: #8B5E28;
+  --color-editorial: var(--sc-accent);
+  --color-editorial-light: var(--sc-accent-soft);
+  --color-editorial-dark: var(--sc-accent-ink);
 
-  /* Hero */
-  --color-hero-bg: #1E1B16;
+  --color-on-ink: var(--sc-on-ink);
+  --color-on-accent: var(--sc-on-accent);
+
+  --color-hero-bg: var(--sc-invert-bg);
+  --color-editorial-invert: var(--sc-accent-invert);
+  --color-invert-ink: var(--sc-invert-ink);
+  --color-invert-ink-2: var(--sc-invert-ink-2);
+  --color-invert-ink-3: var(--sc-invert-ink-3);
+  --color-invert-soft: var(--sc-invert-soft);
+  --color-invert-line: var(--sc-invert-line);
+
+  /* Amber utilities are the accent in disguise (upgrade cards, pills) */
+  --color-amber-50: var(--sc-accent-soft);
+  --color-amber-100: var(--sc-accent-soft);
+  --color-amber-200: var(--sc-accent);
+  --color-amber-300: var(--sc-accent);
+  --color-amber-500: var(--sc-accent);
+  --color-amber-600: var(--sc-accent);
+  --color-amber-700: var(--sc-accent-ink);
+
+  /* Skin-driven corner radii — squircles are opt-in per skin, not default */
+  --radius-lg: var(--sc-radius);
+  --radius-xl: var(--sc-radius);
+  --radius-2xl: var(--sc-radius);
+  --radius-3xl: var(--sc-radius);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  background: var(--sc-bg);
+  color: var(--sc-ink);
+  font-family: var(--sc-font-body);
+}
+
+/* Card frame — every boxed surface goes through this */
+.sc-frame {
+  background: var(--sc-surface);
+  border: var(--sc-border-w) solid var(--sc-line);
+  border-radius: var(--sc-radius);
+  box-shadow: var(--sc-shadow);
+}
+
+/* Inverted frame (back of flash cards) */
+.sc-frame-invert {
+  background: var(--sc-invert-bg);
+  border: var(--sc-border-w) solid var(--sc-line);
+  border-radius: var(--sc-radius);
+  box-shadow: var(--sc-shadow);
+}
+
+/* Display type — headlines and card titles */
+.sc-display {
+  font-family: var(--sc-font-display);
+  text-transform: var(--sc-display-case);
+  letter-spacing: var(--sc-display-tracking);
 }

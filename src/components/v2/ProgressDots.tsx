@@ -17,12 +17,12 @@ export function ProgressDots({ total, current, known, onSelect }: ProgressDotsPr
           key={i}
           onClick={() => onSelect(i)}
           className={cn(
-            'h-2 rounded-full transition-all',
+            'h-1.5 transition-all',
             i === current
-              ? 'w-6 bg-editorial'
+              ? 'w-7 bg-editorial'
               : known.has(i)
-              ? 'w-2 bg-green-400'
-              : 'w-2 bg-warm-200 hover:bg-warm-300'
+              ? 'w-3 bg-green-500'
+              : 'w-3 bg-warm-200 hover:bg-warm-300'
           )}
         />
       ))}

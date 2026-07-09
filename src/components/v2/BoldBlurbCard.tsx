@@ -59,24 +59,24 @@ export function BoldBlurbCard({ blurb, index, spoilerFree, proLevel = 'full' }: 
   };
 
   return (
-    <div className="group rounded-2xl border border-warm-200 bg-warm-white shadow-sm hover:shadow-md transition-all">
+    <div className="group sc-frame transition-all">
       <div className="p-5">
         {/* Sport label + rank */}
         <div className="flex items-center gap-2 mb-2">
-          <span className="text-xs font-medium uppercase tracking-wider text-warm-500">
+          <span className="text-xs font-bold uppercase tracking-wider text-editorial-dark">
             {sportLabel(blurb.sport)}
           </span>
           {blurb.partyTalkRank >= 8 && (
-            <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700">
+            <span className="inline-flex items-center gap-1 bg-amber-100 px-2 py-0.5 text-xs font-bold uppercase tracking-wide text-amber-700">
               <Zap className="h-3 w-3" />
               Hot
             </span>
           )}
-          <span className="ml-auto text-xs text-warm-300">#{index + 1}</span>
+          <span className="ml-auto text-xs text-warm-300 tabular-nums">#{index + 1}</span>
         </div>
 
         {/* Bold headline with sport emoji */}
-        <h2 className="text-lg font-serif font-bold text-warm-900 leading-tight mb-2">
+        <h2 className="sc-display text-lg font-serif font-bold text-warm-900 leading-tight mb-2">
           <span className="mr-2">{sportEmoji(blurb.sport)}</span>
           {blurb.headline}
         </h2>
@@ -88,25 +88,25 @@ export function BoldBlurbCard({ blurb, index, spoilerFree, proLevel = 'full' }: 
 
         {/* Score result — spoiler guarded */}
         {blurb.isSpoiler && blurb.resultSummary && !spoilerFree && (
-          <p className="text-sm font-medium text-warm-900 bg-warm-50 rounded-lg px-3 py-2 mb-3">
+          <p className="text-sm font-medium text-warm-900 bg-warm-50 px-3 py-2 mb-3">
             {blurb.resultSummary}
           </p>
         )}
 
         {/* "Why Should I Care?" callout — the key retention hook */}
-        <div className="rounded-xl bg-editorial-light border border-editorial/20 p-4 mb-3">
-          <p className="text-xs font-semibold text-editorial-dark uppercase tracking-wider mb-1">
+        <div className="border-l-4 border-editorial bg-editorial-light pl-3 pr-3 py-2.5 mb-3">
+          <p className="text-[11px] font-bold text-editorial-dark uppercase tracking-wider mb-1">
             Why Should I Care?
           </p>
-          <p className="text-sm text-warm-900 leading-relaxed font-medium">
+          <p className="text-sm text-warm-900 leading-snug font-medium">
             {blurb.whyShouldICareQuick || blurb.whyShouldICare}
           </p>
         </div>
 
         {/* Memory hook — quotable one-liner (shown for full + partial, locked for locked) */}
         {proLevel !== 'locked' ? (
-          <div className="rounded-xl bg-warm-50 border border-warm-100 px-4 py-3">
-            <p className="text-sm font-serif font-bold italic text-warm-900">
+          <div className="border border-warm-100 bg-warm-50 px-4 py-3">
+            <p className="text-sm font-serif font-bold text-warm-900">
               &ldquo;{blurb.memoryHook}&rdquo;
             </p>
           </div>
