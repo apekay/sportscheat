@@ -21,27 +21,22 @@ function getClient(): Anthropic {
   return new Anthropic({ apiKey });
 }
 
-const MODEL = 'claude-fable-5';
-// Fable's safety classifiers can decline benign requests; the server retries
-// them on Opus 4.8 inside the same call (server-side-fallback beta).
-const FALLBACK_MODEL = 'claude-opus-4-8';
+const MODEL = 'claude-sonnet-5';
 const MAX_RETRIES = 3;
 
 function createMessage(
   anthropic: Anthropic,
   prompt: string,
   maxTokens: number
-): Promise<Anthropic.Beta.BetaMessage> {
-  return anthropic.beta.messages.create({
+): Promise<Anthropic.Message> {
+  return anthropic.messages.create({
     model: MODEL,
     max_tokens: maxTokens,
-    betas: ['server-side-fallback-2026-06-01'],
-    fallbacks: [{ model: FALLBACK_MODEL }],
     messages: [{ role: 'user', content: prompt }],
   });
 }
 
-function getResponseText(message: Anthropic.Beta.BetaMessage): string {
+function getResponseText(message: Anthropic.Message): string {
   if (message.stop_reason === 'refusal') {
     throw new Error('Model declined the request (stop_reason: refusal)');
   }
@@ -50,9 +45,9 @@ function getResponseText(message: Anthropic.Beta.BetaMessage): string {
 }
 
 async function callWithRetry(
-  fn: () => Promise<Anthropic.Beta.BetaMessage>,
+  fn: () => Promise<Anthropic.Message>,
   retries = MAX_RETRIES
-): Promise<Anthropic.Beta.BetaMessage> {
+): Promise<Anthropic.Message> {
   for (let attempt = 0; attempt <= retries; attempt++) {
     try {
       return await fn();
@@ -95,7 +90,7 @@ export async function generateDailyDigestV2(
   const prompt = buildDigestPromptV2(data, languageMode);
 
   const anthropic = getClient();
-  // Extra headroom over the old 7000: Fable's always-on thinking counts
+  // Extra headroom: Sonnet 5's adaptive thinking (on by default) counts
   // toward max_tokens.
   const message = await callWithRetry(() => createMessage(anthropic, prompt, 16000));
 
