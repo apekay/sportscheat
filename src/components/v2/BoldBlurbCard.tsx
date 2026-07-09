@@ -2,8 +2,7 @@
 
 import { useState } from 'react';
 import { StoryBlurb, DrillDownV2 } from '@/types/v1.1';
-import { sportLabel, sportColor, sportEmoji } from '@/lib/utils-v1.1';
-import { cn } from '@/lib/utils';
+import { sportLabel, sportEmoji } from '@/lib/utils-v1.1';
 import {
   ChevronDown,
   ChevronUp,
@@ -14,14 +13,17 @@ import {
 } from 'lucide-react';
 import { PremiumLock } from './UpgradeCard';
 
+/** 'full' = everything visible, 'partial' = conversation starters locked, 'locked' = entire card locked */
+export type ProLevel = 'full' | 'partial' | 'locked';
+
 interface BoldBlurbCardProps {
   blurb: StoryBlurb;
   index: number;
   spoilerFree: boolean;
-  isPro?: boolean;
+  proLevel?: ProLevel;
 }
 
-export function BoldBlurbCard({ blurb, index, spoilerFree, isPro = false }: BoldBlurbCardProps) {
+export function BoldBlurbCard({ blurb, index, spoilerFree, proLevel = 'full' }: BoldBlurbCardProps) {
   const [expanded, setExpanded] = useState(false);
   const [drillDown, setDrillDown] = useState<DrillDownV2 | null>(null);
   const [loading, setLoading] = useState(false);
@@ -101,8 +103,8 @@ export function BoldBlurbCard({ blurb, index, spoilerFree, isPro = false }: Bold
           </p>
         </div>
 
-        {/* Memory hook — quotable one-liner (Pro only) */}
-        {isPro ? (
+        {/* Memory hook — quotable one-liner (shown for full + partial, locked for locked) */}
+        {proLevel !== 'locked' ? (
           <div className="rounded-xl bg-warm-50 border border-warm-100 px-4 py-3">
             <p className="text-sm font-serif font-bold italic text-warm-900">
               &ldquo;{blurb.memoryHook}&rdquo;
@@ -112,8 +114,8 @@ export function BoldBlurbCard({ blurb, index, spoilerFree, isPro = false }: Bold
           <PremiumLock />
         )}
 
-        {/* Conversation starters (Pro only) */}
-        {isPro ? (
+        {/* Conversation starters (full only — locked for partial and locked) */}
+        {proLevel === 'full' ? (
           <>
             <button
               onClick={() => setShowStarters(!showStarters)}
@@ -136,6 +138,8 @@ export function BoldBlurbCard({ blurb, index, spoilerFree, isPro = false }: Bold
               </div>
             )}
           </>
+        ) : proLevel === 'partial' ? (
+          <PremiumLock label="Unlock what to say about this" />
         ) : null}
 
         {/* Expand for drill-down */}

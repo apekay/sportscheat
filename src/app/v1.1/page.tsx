@@ -185,7 +185,7 @@ export default function HomeV2() {
                 Stories first. Scores second. Powered by ESPN + Claude AI.
               </p>
               <p className="mt-2 text-xs text-gray-300">
-                You don&apos;t need to be a fan to belong in the conversation.
+                We belong in the conversation.
               </p>
             </div>
           </>

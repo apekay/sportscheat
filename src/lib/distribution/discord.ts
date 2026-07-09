@@ -19,7 +19,7 @@ export async function sendDiscord(webhookUrl: string, digest: DailyDigestV2): Pr
       fields,
       color: 0x111827,
       footer: {
-        text: "You don't need to be a fan to belong in the conversation.",
+        text: "We belong in the conversation.",
       },
       url: 'https://sportscheat.vercel.app/v2',
     },

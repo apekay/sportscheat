@@ -4,10 +4,10 @@ import { Subscriber, CachedDigest } from '@/types/v2';
 import { todayString } from '@/lib/utils';
 
 function getRedis(): Redis {
-  const url = process.env.KV_REST_API_URL;
-  const token = process.env.KV_REST_API_TOKEN;
+  const url = process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL;
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN;
   if (!url || !token) {
-    throw new Error('Missing KV_REST_API_URL or KV_REST_API_TOKEN env vars');
+    throw new Error('Missing UPSTASH_REDIS_REST_URL/TOKEN env vars');
   }
   return new Redis({ url, token });
 }
@@ -37,6 +37,16 @@ export async function getDigest(date: string): Promise<DailyDigestV2 | null> {
 
 export async function getLatestDigest(): Promise<DailyDigestV2 | null> {
   return getDigest(todayString());
+}
+
+function yesterdayString(): string {
+  const d = new Date();
+  d.setDate(d.getDate() - 1);
+  return d.toISOString().split('T')[0];
+}
+
+export async function getYesterdayDigest(): Promise<DailyDigestV2 | null> {
+  return getDigest(yesterdayString());
 }
 
 // ---- Refresh rate limiting ----

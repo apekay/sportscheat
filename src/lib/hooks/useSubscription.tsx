@@ -5,6 +5,7 @@ import {
   useContext,
   useEffect,
   useState,
+  useSyncExternalStore,
   ReactNode,
 } from 'react';
 import { useSession } from 'next-auth/react';
@@ -19,43 +20,62 @@ const SubscriptionContext = createContext<SubscriptionState>({
   isLoading: false,
 });
 
+const subscribeNever = () => () => {};
+
+const CACHE_KEY = 'sc-sub-status';
+const CACHE_TTL_MS = 5 * 60 * 1000;
+
+/** Returns the cached pro status, or null if missing/expired. */
+function readCachedPro(): boolean | null {
+  try {
+    const cached = localStorage.getItem(CACHE_KEY);
+    if (!cached) return null;
+    const { isPro, ts } = JSON.parse(cached);
+    if (Date.now() - ts < CACHE_TTL_MS) return !!isPro;
+  } catch { /* ignore bad cache */ }
+  return null;
+}
+
+/**
+ * Check for dev bypass via URL params without useSearchParams
+ * (avoids Suspense boundary requirement during static generation)
+ */
+function useDevBypass(): boolean {
+  return useSyncExternalStore(
+    subscribeNever,
+    () => new URLSearchParams(window.location.search).get('dev') === '1',
+    () => false
+  );
+}
+
 export function SubscriptionProvider({ children }: { children: ReactNode }) {
   const { data: session, status } = useSession();
-  const [isPro, setIsPro] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const devBypass = useDevBypass();
+  // null = not fetched yet; stale values after sign-out are masked by the
+  // `authenticated &&` guard in the derived isPro below.
+  const [fetchedPro, setFetchedPro] = useState<boolean | null>(null);
+
+  const authenticated = status === 'authenticated' && !!session?.user;
+  const cachedPro = useSyncExternalStore(subscribeNever, readCachedPro, () => null);
 
   useEffect(() => {
-    if (status !== 'authenticated' || !session?.user) {
-      setIsPro(false);
-      return;
-    }
+    if (!authenticated || cachedPro !== null) return;
 
-    // Check localStorage cache first
-    const cached = localStorage.getItem('sc-sub-status');
-    if (cached) {
-      try {
-        const { isPro: cachedPro, ts } = JSON.parse(cached);
-        // Cache valid for 5 minutes
-        if (Date.now() - ts < 5 * 60 * 1000) {
-          setIsPro(cachedPro);
-          return;
-        }
-      } catch { /* ignore bad cache */ }
-    }
-
-    setIsLoading(true);
     fetch('/api/user/subscription')
       .then((res) => res.json())
       .then((data) => {
-        setIsPro(data.isPro || false);
+        setFetchedPro(data.isPro || false);
         localStorage.setItem(
-          'sc-sub-status',
+          CACHE_KEY,
           JSON.stringify({ isPro: data.isPro, ts: Date.now() })
         );
       })
-      .catch(() => setIsPro(false))
-      .finally(() => setIsLoading(false));
-  }, [session, status]);
+      .catch(() => setFetchedPro(false));
+  }, [authenticated, cachedPro]);
+
+  const isPro = devBypass || (authenticated && (cachedPro ?? fetchedPro ?? false));
+  const isLoading =
+    !devBypass && authenticated && cachedPro === null && fetchedPro === null;
 
   return (
     <SubscriptionContext.Provider value={{ isPro, isLoading }}>

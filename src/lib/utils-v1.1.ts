@@ -22,17 +22,17 @@ export function sportLabel(sport: string): string {
 
 export function sportColor(sport: string): string {
   const colors: Record<string, string> = {
-    nfl: 'bg-green-600',
-    nba: 'bg-orange-500',
-    mlb: 'bg-red-600',
-    nhl: 'bg-blue-600',
-    ncaaf: 'bg-amber-700',
-    ncaab: 'bg-purple-600',
-    wnba: 'bg-pink-500',
-    nwsl: 'bg-teal-600',
-    wta: 'bg-rose-500',
+    nfl: 'bg-green-700',
+    nba: 'bg-orange-700',
+    mlb: 'bg-red-700',
+    nhl: 'bg-blue-700',
+    ncaaf: 'bg-amber-800',
+    ncaab: 'bg-purple-700',
+    wnba: 'bg-pink-700',
+    nwsl: 'bg-teal-700',
+    wta: 'bg-rose-700',
   };
-  return colors[sport] || 'bg-gray-600';
+  return colors[sport] || 'bg-warm-500';
 }
 
 export function sportEmoji(sport: string): string {

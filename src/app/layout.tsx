@@ -21,7 +21,6 @@ const lora = Lora({
   style: ["normal", "italic"],
 });
 
-const adsenseClient = process.env.NEXT_PUBLIC_ADSENSE_CLIENT;
 const googleAdsId = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID;
 
 export const metadata: Metadata = {

@@ -3,15 +3,14 @@ import { getSession } from '@/lib/auth';
 import { getStripe, PRICES } from '@/lib/stripe';
 import { getSupabaseAdmin } from '@/lib/supabase';
 
-export async function POST(request: Request) {
+export async function POST() {
   try {
     const session = await getSession();
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { plan } = await request.json();
-    const priceId = plan === 'yearly' ? PRICES.yearly : PRICES.monthly;
+    const priceId = PRICES.monthly;
 
     if (!priceId) {
       return NextResponse.json({ error: 'Invalid plan' }, { status: 400 });

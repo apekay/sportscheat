@@ -8,6 +8,8 @@ import { RotateCcw, MessageCircle, Check, Lock } from 'lucide-react';
 import { trackCardEngaged, trackStoryMemorized } from '@/lib/analytics/gtag';
 import Link from 'next/link';
 
+export type ProLevel = 'full' | 'partial' | 'locked';
+
 interface SwipeCardProps {
   blurb: StoryBlurb;
   index: number;
@@ -15,7 +17,7 @@ interface SwipeCardProps {
   onNext: () => void;
   onMarkKnown: () => void;
   isKnown: boolean;
-  isPro?: boolean;
+  proLevel?: ProLevel;
 }
 
 export function SwipeCard({
@@ -25,7 +27,7 @@ export function SwipeCard({
   onNext,
   onMarkKnown,
   isKnown,
-  isPro = false,
+  proLevel = 'full',
 }: SwipeCardProps) {
   const [flipped, setFlipped] = useState(false);
 
@@ -69,8 +71,8 @@ export function SwipeCard({
             </p>
           </div>
 
-          {/* Memory hook — the one-liner (Pro only) */}
-          {isPro ? (
+          {/* Memory hook — the one-liner (shown for full + partial, locked for locked) */}
+          {proLevel !== 'locked' ? (
             <div className="rounded-2xl bg-warm-50 border border-warm-100 px-5 py-4 mb-6">
               <p className="text-base font-serif font-bold italic text-warm-900 text-center">
                 &ldquo;{blurb.memoryHook}&rdquo;
@@ -82,7 +84,7 @@ export function SwipeCard({
               className="flex items-center justify-center gap-2 rounded-2xl bg-warm-50 border border-warm-200 px-5 py-4 mb-6 hover:border-amber-300 hover:bg-amber-50 transition-colors"
             >
               <Lock className="h-4 w-4 text-warm-300" />
-              <span className="text-sm text-warm-400">Unlock quote with Pro</span>
+              <span className="text-sm text-warm-400">Unlock quote with Gameface</span>
             </Link>
           )}
 
@@ -146,8 +148,8 @@ export function SwipeCard({
             </div>
           )}
 
-          {/* Conversation starters (Pro only) */}
-          {isPro && blurb.conversationStarters?.length > 0 && (
+          {/* Conversation starters (full only — locked for partial, hidden for locked) */}
+          {proLevel === 'full' && blurb.conversationStarters?.length > 0 && (
             <div className="mb-4">
               <div className="flex items-center gap-1.5 text-xs font-semibold text-warm-300 mb-2">
                 <MessageCircle className="h-3.5 w-3.5" />
@@ -161,6 +163,15 @@ export function SwipeCard({
                 ))}
               </div>
             </div>
+          )}
+          {proLevel === 'partial' && (
+            <Link
+              href="/pricing"
+              className="flex items-center gap-2 rounded-xl bg-white/10 border border-white/20 px-4 py-3 mb-4 hover:bg-white/20 transition-colors"
+            >
+              <Lock className="h-3.5 w-3.5 text-warm-300" />
+              <span className="text-xs text-warm-300">Unlock what to say about this</span>
+            </Link>
           )}
 
           {/* Action buttons */}

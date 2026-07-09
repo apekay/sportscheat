@@ -33,7 +33,7 @@ export function V2Header({
           {isPro ? (
             <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-700">
               <Sparkles className="h-3 w-3" />
-              Pro
+              Gameface
             </span>
           ) : (
             <span className="rounded-full bg-editorial px-2 py-0.5 text-xs text-white font-medium">
@@ -85,7 +85,7 @@ export function V2Header({
               className="inline-flex items-center gap-1 rounded-lg bg-amber-100 px-2.5 py-1.5 text-xs font-semibold text-amber-700 hover:bg-amber-200 transition-colors"
             >
               <Sparkles className="h-3.5 w-3.5" />
-              Upgrade
+              Gameface
             </Link>
           ) : (
             <Link

@@ -42,7 +42,7 @@ export function AdUnit({
   if (isDev || !client) {
     return (
       <div
-        className={`flex items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 text-xs text-gray-400 ${className}`}
+        className={`flex items-center justify-center rounded-lg border-2 border-dashed border-warm-200 bg-warm-50 text-xs text-warm-300 ${className}`}
         style={{ minHeight: 90 }}
       >
         Ad Placeholder

@@ -19,10 +19,10 @@ export function ProgressDots({ total, current, known, onSelect }: ProgressDotsPr
           className={cn(
             'h-2 rounded-full transition-all',
             i === current
-              ? 'w-6 bg-indigo-600'
+              ? 'w-6 bg-editorial'
               : known.has(i)
               ? 'w-2 bg-green-400'
-              : 'w-2 bg-gray-300 hover:bg-gray-400'
+              : 'w-2 bg-warm-200 hover:bg-warm-300'
           )}
         />
       ))}

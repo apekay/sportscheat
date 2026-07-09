@@ -55,7 +55,7 @@ export async function sendEmail(email: string, digest: DailyDigestV2): Promise<v
       </div>
 
       <div style="padding: 16px; text-align: center; font-size: 12px; color: #9ca3af;">
-        You don't need to be a fan to belong in the conversation.
+        We belong in the conversation.
       </div>
     </div>
   `;

@@ -9,10 +9,12 @@ function handler() {
   return _handler;
 }
 
-export async function GET(req: Request, ctx: any) {
+type RouteContext = { params: Promise<{ nextauth: string[] }> };
+
+export async function GET(req: Request, ctx: RouteContext) {
   return handler()(req, ctx);
 }
 
-export async function POST(req: Request, ctx: any) {
+export async function POST(req: Request, ctx: RouteContext) {
   return handler()(req, ctx);
 }

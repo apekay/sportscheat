@@ -97,6 +97,47 @@ export default function SwipePageClient({ initialDigest }: Props) {
         )}
 
         {digest && <SwipeStack digest={digest} spoilerFree={spoilerFree} isPro={isPro} />}
+
+        {digest && (
+          <>
+            {/* Share nudge */}
+            <div className="mt-4 rounded-2xl border border-warm-200 bg-warm-50 p-5 text-center">
+              <p className="text-sm font-serif font-medium text-warm-700 mb-3">
+                Know someone who might need this?
+              </p>
+              <button
+                onClick={() => {
+                  if (navigator.share) {
+                    navigator.share({
+                      title: 'Sporting Chance',
+                      text: 'Get yourself off the bench in 3 mins — today\'s sports cheat sheet',
+                      url: 'https://sportingchance.app',
+                    });
+                  } else {
+                    navigator.clipboard.writeText('https://sportingchance.app');
+                    alert('Link copied!');
+                  }
+                }}
+                className="inline-flex items-center gap-2 rounded-xl bg-warm-900 px-5 py-2.5 text-sm font-semibold text-white hover:bg-warm-700 transition-colors"
+              >
+                Share the cheat code
+              </button>
+            </div>
+
+            {/* Stories counter */}
+            <div className="mt-4 py-2 text-center">
+              <p className="text-xs text-warm-400">
+                {digest.blurbs.length} stories today · ready in 3 mins
+              </p>
+            </div>
+
+            <div className="py-4 text-center">
+              <p className="text-xs text-warm-300">
+                We belong in the conversation.
+              </p>
+            </div>
+          </>
+        )}
       </main>
     </div>
   );

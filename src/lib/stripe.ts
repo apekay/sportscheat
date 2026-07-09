@@ -20,5 +20,4 @@ export function getStripe(): Stripe {
 
 export const PRICES = {
   monthly: process.env.STRIPE_MONTHLY_PRICE_ID || '',
-  yearly: process.env.STRIPE_YEARLY_PRICE_ID || '',
 } as const;
