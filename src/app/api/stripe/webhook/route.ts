@@ -50,7 +50,7 @@ export async function POST(request: Request) {
         }
 
         const firstItem = subscription.items.data[0];
-        await supabase.from('subscriptions').upsert(
+        const { error } = await supabase.from('subscriptions').upsert(
           {
             user_id: userId,
             stripe_customer_id: session.customer as string,
@@ -66,6 +66,8 @@ export async function POST(request: Request) {
           },
           { onConflict: 'user_id' }
         );
+        // Surface DB failures as 500 so Stripe retries the event
+        if (error) throw new Error(`subscriptions upsert failed: ${error.message}`);
         break;
       }
 
@@ -83,7 +85,7 @@ export async function POST(request: Request) {
           : subscription.status;
 
         const updatedItem = subscription.items.data[0];
-        await supabase
+        const { error } = await supabase
           .from('subscriptions')
           .update({
             status,
@@ -95,6 +97,7 @@ export async function POST(request: Request) {
             updated_at: new Date().toISOString(),
           })
           .eq('user_id', userId);
+        if (error) throw new Error(`subscription update failed: ${error.message}`);
         break;
       }
 
@@ -106,7 +109,7 @@ export async function POST(request: Request) {
 
         if (!userId) break;
 
-        await supabase
+        const { error } = await supabase
           .from('subscriptions')
           .update({
             status: 'canceled',
@@ -114,6 +117,7 @@ export async function POST(request: Request) {
             updated_at: new Date().toISOString(),
           })
           .eq('user_id', userId);
+        if (error) throw new Error(`subscription cancel failed: ${error.message}`);
         break;
       }
 
@@ -124,13 +128,14 @@ export async function POST(request: Request) {
 
         if (!userId) break;
 
-        await supabase
+        const { error } = await supabase
           .from('subscriptions')
           .update({
             status: 'past_due',
             updated_at: new Date().toISOString(),
           })
           .eq('user_id', userId);
+        if (error) throw new Error(`past_due update failed: ${error.message}`);
         break;
       }
     }
