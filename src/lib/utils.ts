@@ -48,23 +48,3 @@ export function todayString(): string {
 export function generateId(): string {
   return Math.random().toString(36).substring(2, 15);
 }
-
-/**
- * Free users get fresh content on Tuesdays (2) and Fridays (5).
- * Returns true if today is a free-content day.
- */
-export function isFreeContentDay(): boolean {
-  const day = new Date().getDay(); // 0=Sun, 1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri, 6=Sat
-  return day === 2 || day === 5;
-}
-
-/**
- * Returns the name of the next free-content day.
- */
-export function nextFreeDay(): string {
-  const day = new Date().getDay();
-  // Days: 0=Sun, 1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri, 6=Sat
-  if (day < 2) return 'Tuesday';
-  if (day < 5) return 'Friday';
-  return 'Tuesday'; // Sat or Sun → next Tuesday
-}

@@ -4,8 +4,7 @@ import { DailyDigestV2 } from '@/types/v1.1';
 import { BoldHeroSection } from './BoldHeroSection';
 import { BoldBlurbCard, ProLevel } from './BoldBlurbCard';
 import { AdBanner } from '@/components/ads/AdBanner';
-import { UpgradeCard, NextUpdateCard } from './UpgradeCard';
-import { isFreeContentDay, nextFreeDay } from '@/lib/utils';
+import { UpgradeCard } from './UpgradeCard';
 
 interface BoldLayoutProps {
   digest: DailyDigestV2;
@@ -31,8 +30,6 @@ export function BoldLayout({ digest, spoilerFree, isPro = false }: BoldLayoutPro
     (a, b) => b.partyTalkRank - a.partyTalkRank
   );
 
-  const freeDay = isPro || isFreeContentDay();
-
   return (
     <div>
       <BoldHeroSection digest={digest} />
@@ -40,55 +37,42 @@ export function BoldLayout({ digest, spoilerFree, isPro = false }: BoldLayoutPro
       {/* Ad after hero (free users only) */}
       {!isPro && <AdBanner />}
 
-      {/* Non-free day: show 1 teaser blurb + come-back card */}
-      {!freeDay ? (
-        <div className="space-y-4">
-          <BoldBlurbCard
-            blurb={sortedBlurbs[0]}
-            index={0}
-            spoilerFree={spoilerFree}
-            proLevel="partial"
-          />
-          <NextUpdateCard nextDay={nextFreeDay()} />
-        </div>
-      ) : (
-        <div className="space-y-4">
-          {sortedBlurbs.map((blurb, index) => {
-            const proLevel = getProLevel(index, isPro);
+      <div className="space-y-4">
+        {sortedBlurbs.map((blurb, index) => {
+          const proLevel = getProLevel(index, isPro);
 
-            // For fully locked cards, show UpgradeCard instead
-            if (proLevel === 'locked') {
-              // Only show UpgradeCard once (at the first locked position)
-              if (index === 3) {
-                const lockedCount = sortedBlurbs.length - 3;
-                return (
-                  <UpgradeCard
-                    key="upgrade"
-                    remainingCount={lockedCount}
-                    variant="bold"
-                  />
-                );
-              }
-              return null;
-            }
-
-            return (
-              <div key={blurb.id}>
-                <BoldBlurbCard
-                  blurb={blurb}
-                  index={index}
-                  spoilerFree={spoilerFree}
-                  proLevel={proLevel}
+          // For fully locked cards, show UpgradeCard instead
+          if (proLevel === 'locked') {
+            // Only show UpgradeCard once (at the first locked position)
+            if (index === 3) {
+              const lockedCount = sortedBlurbs.length - 3;
+              return (
+                <UpgradeCard
+                  key="upgrade"
+                  remainingCount={lockedCount}
+                  variant="bold"
                 />
-                {/* In-feed ad every 3 cards (free users only) */}
-                {!isPro && (index + 1) % 3 === 0 && index < sortedBlurbs.length - 1 && (
-                  <AdBanner className="mt-4" />
-                )}
-              </div>
-            );
-          })}
-        </div>
-      )}
+              );
+            }
+            return null;
+          }
+
+          return (
+            <div key={blurb.id}>
+              <BoldBlurbCard
+                blurb={blurb}
+                index={index}
+                spoilerFree={spoilerFree}
+                proLevel={proLevel}
+              />
+              {/* In-feed ad every 3 cards (free users only) */}
+              {!isPro && (index + 1) % 3 === 0 && index < sortedBlurbs.length - 1 && (
+                <AdBanner className="mt-4" />
+              )}
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }

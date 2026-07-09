@@ -50,14 +50,12 @@ export default function PricingPage() {
 
   const features = {
     free: [
-      'Updated twice a week',
-      'Top 2 stories per update',
+      'Top 3 stories every day',
       'Why Should I Care context',
       'Spoiler-free mode',
     ],
     pro: [
-      'Daily updates',
-      'All stories every day',
+      'Every story, every day',
       'Quotable one-liners',
       'Conversation starters — what to say',
       'No ads',

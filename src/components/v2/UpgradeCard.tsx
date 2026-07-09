@@ -33,7 +33,7 @@ export function UpgradeCard({ remainingCount, variant = 'bold' }: UpgradeCardPro
       </h3>
 
       <p className="text-sm text-warm-600 leading-relaxed mb-4">
-        Get daily updates, all stories, quotable one-liners, and what to say about each one. Plus, no ads.
+        Unlock every story, quotable one-liners, and what to say about each one. Plus, no ads.
       </p>
 
       <div className="flex flex-col gap-2">
@@ -43,37 +43,6 @@ export function UpgradeCard({ remainingCount, variant = 'bold' }: UpgradeCardPro
         >
           <Sparkles className="h-4 w-4" />
           Get off the bench — 6 months free
-        </Link>
-      </div>
-    </div>
-  );
-}
-
-/** Card shown on non-update days for free users */
-export function NextUpdateCard({ nextDay, variant = 'bold' }: { nextDay: string; variant?: 'bold' | 'swipe' }) {
-  const isSwipe = variant === 'swipe';
-
-  return (
-    <div
-      className={`${
-        isSwipe
-          ? 'w-full rounded-3xl bg-warm-white border border-warm-200 shadow-lg p-6 sm:p-8'
-          : 'rounded-2xl border border-warm-200 bg-warm-white shadow-sm p-6'
-      }`}
-    >
-      <p className={`font-serif font-bold text-warm-900 mb-2 ${isSwipe ? 'text-2xl' : 'text-lg'}`}>
-        Your next update drops {nextDay}
-      </p>
-      <p className="text-sm text-warm-600 leading-relaxed mb-4">
-        Free updates land twice a week. Want daily stories instead?
-      </p>
-      <div className="flex flex-col gap-2">
-        <Link
-          href="/pricing"
-          className="flex items-center justify-center gap-2 rounded-xl bg-warm-900 py-3 text-sm font-semibold text-white hover:bg-warm-700 transition-colors"
-        >
-          <Sparkles className="h-4 w-4" />
-          Go daily — 6 months free
         </Link>
       </div>
     </div>

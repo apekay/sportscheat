@@ -5,9 +5,8 @@ import { DailyDigestV2 } from '@/types/v1.1';
 import { SwipeCard, ProLevel } from './SwipeCard';
 import { ProgressDots } from './ProgressDots';
 import { AdBanner } from '@/components/ads/AdBanner';
-import { UpgradeCard, NextUpdateCard } from './UpgradeCard';
+import { UpgradeCard } from './UpgradeCard';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { isFreeContentDay, nextFreeDay } from '@/lib/utils';
 
 interface SwipeStackProps {
   digest: DailyDigestV2;
@@ -33,15 +32,8 @@ export function SwipeStack({ digest, spoilerFree, isPro = false }: SwipeStackPro
     (a, b) => b.partyTalkRank - a.partyTalkRank
   );
 
-  const freeDay = isPro || isFreeContentDay();
-
-  // On non-free days, show just 1 teaser card
-  // On free days, show 3 cards (2 full + 1 partial)
-  const visibleCount = isPro
-    ? allBlurbs.length
-    : freeDay
-      ? Math.min(3, allBlurbs.length)
-      : 1;
+  // Free users see 3 cards (2 full + 1 partial); pro sees everything
+  const visibleCount = isPro ? allBlurbs.length : Math.min(3, allBlurbs.length);
   const lockedCount = allBlurbs.length - visibleCount;
 
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -90,11 +82,7 @@ export function SwipeStack({ digest, spoilerFree, isPro = false }: SwipeStackPro
       <div className="flex-1 flex items-start justify-center px-2">
         <div className="w-full max-w-md">
           {showUpgrade && !isPro ? (
-            freeDay ? (
-              <UpgradeCard remainingCount={lockedCount} variant="swipe" />
-            ) : (
-              <NextUpdateCard nextDay={nextFreeDay()} variant="swipe" />
-            )
+            <UpgradeCard remainingCount={lockedCount} variant="swipe" />
           ) : currentBlurb ? (
             <SwipeCard
               key={currentBlurb.id}
@@ -104,7 +92,7 @@ export function SwipeStack({ digest, spoilerFree, isPro = false }: SwipeStackPro
               onNext={goNext}
               onMarkKnown={markKnown}
               isKnown={knownSet.has(currentIndex)}
-              proLevel={freeDay ? getProLevel(currentIndex, isPro) : 'partial'}
+              proLevel={getProLevel(currentIndex, isPro)}
             />
           ) : null}
         </div>
