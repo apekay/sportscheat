@@ -10,7 +10,7 @@ interface DigestHeaderV2Props {
 }
 
 export function DigestHeaderV2({ digest, readingMode }: DigestHeaderV2Props) {
-  const dateStr = format(new Date(digest.date), 'EEEE, MMMM d, yyyy');
+  const dateStr = format(new Date(digest.date + 'T00:00:00'), 'EEEE, MMMM d, yyyy');
   const sportKeys = Object.keys(digest.sportsSummary) as Sport[];
 
   return (

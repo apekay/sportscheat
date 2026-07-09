@@ -5,8 +5,8 @@ import { generateDailyDigestV2 } from '@/lib/ai/claude-v1.1';
 import { todayString } from '@/lib/utils';
 import { LanguageMode } from '@/types/v1.1';
 
-// Allow up to 60s for regeneration
-export const maxDuration = 60;
+// Live regeneration takes ~2 min on Fable (requires Vercel Pro)
+export const maxDuration = 300;
 
 // POST /api/v2/refresh — user-triggered digest regeneration (rate-limited)
 export async function POST(request: Request) {

@@ -27,13 +27,13 @@ export function V2Header({
     <header className="sticky top-0 z-10 border-b border-warm-200 bg-warm-white/90 backdrop-blur-md">
       <div className="mx-auto flex max-w-2xl items-center justify-between px-4 py-3">
         <div className="flex items-center gap-2">
-          <a href="/v2" className="text-xl font-serif font-bold text-warm-900">
+          <a href="/v2" className="text-lg sm:text-xl font-serif font-bold text-warm-900 whitespace-nowrap">
             Sporting Chance
           </a>
           {isPro ? (
             <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-700">
               <Sparkles className="h-3 w-3" />
-              Gameface
+              <span className="hidden sm:inline">Gameface</span>
             </span>
           ) : (
             <span className="rounded-full bg-editorial px-2 py-0.5 text-xs text-white font-medium">
@@ -58,7 +58,9 @@ export function V2Header({
             ) : (
               <Eye className="h-3.5 w-3.5" />
             )}
-            {spoilerFree ? 'Spoiler-Free' : 'Scores On'}
+            <span className="hidden sm:inline">
+              {spoilerFree ? 'Spoiler-Free' : 'Scores On'}
+            </span>
           </button>
 
           <button

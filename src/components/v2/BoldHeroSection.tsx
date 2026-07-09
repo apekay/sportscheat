@@ -9,7 +9,7 @@ interface BoldHeroSectionProps {
 }
 
 export function BoldHeroSection({ digest }: BoldHeroSectionProps) {
-  const dateStr = format(new Date(digest.date), 'EEEE, MMMM d');
+  const dateStr = format(new Date(digest.date + 'T00:00:00'), 'EEEE, MMMM d');
   const sportKeys = Object.keys(digest.sportsSummary) as Sport[];
 
   return (

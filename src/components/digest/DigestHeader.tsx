@@ -9,7 +9,7 @@ interface DigestHeaderProps {
 }
 
 export function DigestHeader({ digest }: DigestHeaderProps) {
-  const dateStr = format(new Date(digest.date), 'EEEE, MMMM d, yyyy');
+  const dateStr = format(new Date(digest.date + 'T00:00:00'), 'EEEE, MMMM d, yyyy');
   const sportKeys = Object.keys(digest.sportsSummary) as Sport[];
 
   return (
