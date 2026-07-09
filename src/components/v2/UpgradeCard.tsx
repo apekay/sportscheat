@@ -42,7 +42,7 @@ export function UpgradeCard({ remainingCount, variant = 'bold' }: UpgradeCardPro
           className="flex items-center justify-center gap-2 rounded-xl bg-warm-900 py-3 text-sm font-semibold text-white hover:bg-warm-700 transition-colors"
         >
           <Sparkles className="h-4 w-4" />
-          Get off the bench — $1/mo
+          Get off the bench — 6 months free
         </Link>
       </div>
     </div>
@@ -73,7 +73,7 @@ export function NextUpdateCard({ nextDay, variant = 'bold' }: { nextDay: string;
           className="flex items-center justify-center gap-2 rounded-xl bg-warm-900 py-3 text-sm font-semibold text-white hover:bg-warm-700 transition-colors"
         >
           <Sparkles className="h-4 w-4" />
-          Go daily — $1/mo
+          Go daily — 6 months free
         </Link>
       </div>
     </div>

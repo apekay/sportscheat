@@ -52,6 +52,7 @@ export async function POST() {
       success_url: `${process.env.NEXTAUTH_URL}/v2?upgraded=true`,
       cancel_url: `${process.env.NEXTAUTH_URL}/pricing`,
       subscription_data: {
+        trial_period_days: 180, // free for ~6 months, then billed monthly
         metadata: { userId: session.user.id },
       },
     });

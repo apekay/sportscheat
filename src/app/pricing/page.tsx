@@ -87,7 +87,7 @@ export default function PricingPage() {
           </h1>
           <p className="text-base text-warm-600 max-w-md mx-auto">
             Daily updates, every story, every quotable line, and what to say about each one.
-            For a dollar a month.
+            Free for your first 6 months, then 50¢ a month.
           </p>
         </div>
 
@@ -119,11 +119,11 @@ export default function PricingPage() {
                 Gameface
               </h3>
               <div className="flex items-baseline justify-center gap-1 mb-1">
-                <span className="text-4xl font-serif font-bold text-warm-900">$1</span>
+                <span className="text-4xl font-serif font-bold text-warm-900">50¢</span>
                 <span className="text-sm text-warm-400">/mo</span>
               </div>
               <p className="text-xs text-warm-400 mb-6">
-                Cancel anytime
+                First 6 months free · Cancel anytime
               </p>
               <ul className="space-y-2 mb-6 text-left">
                 {features.pro.map((f) => (
@@ -143,7 +143,7 @@ export default function PricingPage() {
                 ) : (
                   <>
                     <Sparkles className="h-4 w-4" />
-                    Get off the bench
+                    Start 6 months free
                   </>
                 )}
               </button>

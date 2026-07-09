@@ -22,8 +22,9 @@ export async function getUserSubscription(
       return { isPro: false, status: 'inactive', currentPeriodEnd: null, cancelAtPeriodEnd: false };
     }
 
+    // 'trialing' = inside the 6-month free period; counts as pro
     const isPro =
-      data.status === 'active' &&
+      (data.status === 'active' || data.status === 'trialing') &&
       (!data.current_period_end || new Date(data.current_period_end) > new Date());
 
     return {

@@ -56,7 +56,8 @@ export async function POST(request: Request) {
             stripe_customer_id: session.customer as string,
             stripe_subscription_id: subscription.id,
             stripe_price_id: firstItem?.price?.id || null,
-            status: 'active',
+            // 'trialing' during the 6-month free period, 'active' after
+            status: subscription.status,
             current_period_end: firstItem
               ? new Date(firstItem.current_period_end * 1000).toISOString()
               : null,
