@@ -5,7 +5,6 @@ import { DailyDigestV2 } from '@/types/v1.1';
 import { V2Header } from '@/components/v2/V2Header';
 import { SwipeStack } from '@/components/v2/SwipeStack';
 import { trackDigestLoaded, trackDigestRefreshed } from '@/lib/analytics/gtag';
-import { useSubscription } from '@/lib/hooks/useSubscription';
 import { Loader2 } from 'lucide-react';
 
 interface Props {
@@ -17,7 +16,6 @@ export default function SwipePageClient({ initialDigest }: Props) {
   const [loading, setLoading] = useState(!initialDigest);
   const [error, setError] = useState<string | null>(null);
   const [spoilerFree, setSpoilerFree] = useState(true);
-  const { isPro } = useSubscription();
 
   const fetchDigest = useCallback(async () => {
     setLoading(true);
@@ -95,7 +93,7 @@ export default function SwipePageClient({ initialDigest }: Props) {
           </div>
         )}
 
-        {digest && <SwipeStack digest={digest} spoilerFree={spoilerFree} isPro={isPro} />}
+        {digest && <SwipeStack digest={digest} spoilerFree={spoilerFree} />}
 
         {digest && (
           <>

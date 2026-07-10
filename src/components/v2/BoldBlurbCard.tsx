@@ -11,19 +11,14 @@ import {
   Loader2,
   Zap,
 } from 'lucide-react';
-import { PremiumLock } from './UpgradeCard';
-
-/** 'full' = everything visible, 'partial' = conversation starters locked, 'locked' = entire card locked */
-export type ProLevel = 'full' | 'partial' | 'locked';
 
 interface BoldBlurbCardProps {
   blurb: StoryBlurb;
   index: number;
   spoilerFree: boolean;
-  proLevel?: ProLevel;
 }
 
-export function BoldBlurbCard({ blurb, index, spoilerFree, proLevel = 'full' }: BoldBlurbCardProps) {
+export function BoldBlurbCard({ blurb, index, spoilerFree }: BoldBlurbCardProps) {
   const [expanded, setExpanded] = useState(false);
   const [drillDown, setDrillDown] = useState<DrillDownV2 | null>(null);
   const [loading, setLoading] = useState(false);
@@ -103,44 +98,34 @@ export function BoldBlurbCard({ blurb, index, spoilerFree, proLevel = 'full' }: 
           </p>
         </div>
 
-        {/* Memory hook — quotable one-liner (shown for full + partial, locked for locked) */}
-        {proLevel !== 'locked' ? (
-          <div className="border border-warm-100 bg-warm-50 px-4 py-3">
-            <p className="text-sm font-serif font-bold text-warm-900">
-              &ldquo;{blurb.memoryHook}&rdquo;
-            </p>
-          </div>
-        ) : (
-          <PremiumLock />
-        )}
+        {/* Memory hook — quotable one-liner */}
+        <div className="border border-warm-100 bg-warm-50 px-4 py-3">
+          <p className="text-sm font-serif font-bold text-warm-900">
+            &ldquo;{blurb.memoryHook}&rdquo;
+          </p>
+        </div>
 
-        {/* Conversation starters (full only — locked for partial and locked) */}
-        {proLevel === 'full' ? (
-          <>
-            <button
-              onClick={() => setShowStarters(!showStarters)}
-              className="mt-3 flex items-center gap-1.5 text-sm text-editorial-dark hover:text-editorial font-medium transition-colors"
-            >
-              <MessageCircle className="h-4 w-4" />
-              {showStarters ? 'Hide starters' : 'How to bring this up'}
-            </button>
+        {/* Conversation starters */}
+        <button
+          onClick={() => setShowStarters(!showStarters)}
+          className="mt-3 flex items-center gap-1.5 text-sm text-editorial-dark hover:text-editorial font-medium transition-colors"
+        >
+          <MessageCircle className="h-4 w-4" />
+          {showStarters ? 'Hide starters' : 'How to bring this up'}
+        </button>
 
-            {showStarters && blurb.conversationStarters?.length > 0 && (
-              <div className="mt-2 space-y-1.5">
-                {blurb.conversationStarters.map((s, i) => (
-                  <div
-                    key={i}
-                    className="rounded-lg bg-editorial-light px-3 py-2 text-xs text-editorial-dark italic"
-                  >
-                    &ldquo;{s}&rdquo;
-                  </div>
-                ))}
+        {showStarters && blurb.conversationStarters?.length > 0 && (
+          <div className="mt-2 space-y-1.5">
+            {blurb.conversationStarters.map((s, i) => (
+              <div
+                key={i}
+                className="rounded-lg bg-editorial-light px-3 py-2 text-xs text-editorial-dark italic"
+              >
+                &ldquo;{s}&rdquo;
               </div>
-            )}
-          </>
-        ) : proLevel === 'partial' ? (
-          <PremiumLock label="Unlock what to say about this" />
-        ) : null}
+            ))}
+          </div>
+        )}
 
         {/* Expand for drill-down */}
         <button

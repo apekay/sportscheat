@@ -4,11 +4,8 @@ import { useState } from 'react';
 import { StoryBlurb } from '@/types/v1.1';
 import { sportLabel, sportEmoji } from '@/lib/utils-v1.1';
 import { cn } from '@/lib/utils';
-import { RotateCcw, MessageCircle, Check, Lock } from 'lucide-react';
+import { RotateCcw, MessageCircle, Check } from 'lucide-react';
 import { trackCardEngaged, trackStoryMemorized } from '@/lib/analytics/gtag';
-import Link from 'next/link';
-
-export type ProLevel = 'full' | 'partial' | 'locked';
 
 interface SwipeCardProps {
   blurb: StoryBlurb;
@@ -17,7 +14,6 @@ interface SwipeCardProps {
   onNext: () => void;
   onMarkKnown: () => void;
   isKnown: boolean;
-  proLevel?: ProLevel;
 }
 
 export function SwipeCard({
@@ -27,7 +23,6 @@ export function SwipeCard({
   onNext,
   onMarkKnown,
   isKnown,
-  proLevel = 'full',
 }: SwipeCardProps) {
   const [flipped, setFlipped] = useState(false);
 
@@ -72,24 +67,14 @@ export function SwipeCard({
           </div>
 
           {/* Memory hook — the line you'll actually say */}
-          {proLevel !== 'locked' ? (
-            <div className="border border-warm-200 bg-warm-50 px-5 py-4 mb-5">
-              <p className="text-[11px] font-bold text-warm-500 uppercase tracking-wider mb-1">
-                Say this
-              </p>
-              <p className="text-base font-serif font-bold text-warm-900 leading-snug">
-                &ldquo;{blurb.memoryHook}&rdquo;
-              </p>
-            </div>
-          ) : (
-            <Link
-              href="/pricing"
-              className="flex items-center justify-center gap-2 border border-warm-200 bg-warm-50 px-5 py-4 mb-5 hover:border-amber-300 hover:bg-amber-50 transition-colors"
-            >
-              <Lock className="h-4 w-4 text-warm-300" />
-              <span className="text-sm text-warm-400">Unlock quote with Gameface</span>
-            </Link>
-          )}
+          <div className="border border-warm-200 bg-warm-50 px-5 py-4 mb-5">
+            <p className="text-[11px] font-bold text-warm-500 uppercase tracking-wider mb-1">
+              Say this
+            </p>
+            <p className="text-base font-serif font-bold text-warm-900 leading-snug">
+              &ldquo;{blurb.memoryHook}&rdquo;
+            </p>
+          </div>
 
           {/* Tap to flip prompt */}
           <button
@@ -151,8 +136,8 @@ export function SwipeCard({
             </div>
           )}
 
-          {/* Conversation starters (full only — locked for partial, hidden for locked) */}
-          {proLevel === 'full' && blurb.conversationStarters?.length > 0 && (
+          {/* Conversation starters */}
+          {blurb.conversationStarters?.length > 0 && (
             <div className="mb-4">
               <div className="flex items-center gap-1.5 text-xs font-semibold text-invert-ink-3 mb-2">
                 <MessageCircle className="h-3.5 w-3.5" />
@@ -166,15 +151,6 @@ export function SwipeCard({
                 ))}
               </div>
             </div>
-          )}
-          {proLevel === 'partial' && (
-            <Link
-              href="/pricing"
-              className="flex items-center gap-2 bg-invert-soft border border-invert-line px-4 py-3 mb-4 hover:opacity-80 transition-opacity"
-            >
-              <Lock className="h-3.5 w-3.5 text-invert-ink-3" />
-              <span className="text-xs text-invert-ink-3">Unlock what to say about this</span>
-            </Link>
           )}
 
           {/* Action buttons */}

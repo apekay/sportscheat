@@ -6,7 +6,6 @@ import { V2Header } from '@/components/v2/V2Header';
 import { BoldLayout } from '@/components/v2/BoldLayout';
 import { AdBanner } from '@/components/ads/AdBanner';
 import { trackDigestLoaded, trackDigestRefreshed } from '@/lib/analytics/gtag';
-import { useSubscription } from '@/lib/hooks/useSubscription';
 import { Loader2 } from 'lucide-react';
 
 interface Props {
@@ -18,7 +17,6 @@ export default function BoldPageClient({ initialDigest }: Props) {
   const [loading, setLoading] = useState(!initialDigest);
   const [error, setError] = useState<string | null>(null);
   const [spoilerFree, setSpoilerFree] = useState(true);
-  const { isPro } = useSubscription();
 
   const fetchDigest = useCallback(async () => {
     setLoading(true);
@@ -96,11 +94,11 @@ export default function BoldPageClient({ initialDigest }: Props) {
           </div>
         )}
 
-        {digest && <BoldLayout digest={digest} spoilerFree={spoilerFree} isPro={isPro} />}
+        {digest && <BoldLayout digest={digest} spoilerFree={spoilerFree} />}
 
         {digest && (
           <>
-            {!isPro && <AdBanner className="mt-6" />}
+            <AdBanner className="mt-6" />
 
             {/* Share nudge */}
             <div className="mt-6 rounded-2xl border border-warm-200 bg-warm-50 p-5 text-center">

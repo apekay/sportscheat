@@ -2,43 +2,23 @@
 
 import { useState } from 'react';
 import { DailyDigestV2 } from '@/types/v1.1';
-import { SwipeCard, ProLevel } from './SwipeCard';
+import { SwipeCard } from './SwipeCard';
 import { ProgressDots } from './ProgressDots';
 import { AdBanner } from '@/components/ads/AdBanner';
-import { UpgradeCard } from './UpgradeCard';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface SwipeStackProps {
   digest: DailyDigestV2;
   spoilerFree: boolean;
-  isPro?: boolean;
 }
 
-/**
- * Determines per-card pro level for free users:
- * - Cards 0-1 (blurbs 1-2): 'full' — everything visible
- * - Card 2 (blurb 3): 'partial' — conversation starters locked
- * - Cards 3+ (blurbs 4-5): 'locked' — fully pro-locked (show UpgradeCard)
- */
-function getProLevel(index: number, isPro: boolean): ProLevel {
-  if (isPro) return 'full';
-  if (index <= 1) return 'full';
-  if (index === 2) return 'partial';
-  return 'locked';
-}
-
-export function SwipeStack({ digest, spoilerFree, isPro = false }: SwipeStackProps) {
+export function SwipeStack({ digest, spoilerFree }: SwipeStackProps) {
   const allBlurbs = [...digest.blurbs].sort(
     (a, b) => b.partyTalkRank - a.partyTalkRank
   );
 
-  // Free users see 3 cards (2 full + 1 partial); pro sees everything
-  const visibleCount = isPro ? allBlurbs.length : Math.min(3, allBlurbs.length);
-  const lockedCount = allBlurbs.length - visibleCount;
-
   const [currentIndex, setCurrentIndex] = useState(0);
   const [knownSet, setKnownSet] = useState<Set<number>>(new Set());
-  const [showUpgrade, setShowUpgrade] = useState(false);
 
   // Filter out spoiler data if spoilerFree
   const processedBlurbs = allBlurbs.map((b) => ({
@@ -47,16 +27,10 @@ export function SwipeStack({ digest, spoilerFree, isPro = false }: SwipeStackPro
   }));
 
   const goNext = () => {
-    // Free users: after last visible card, show upgrade
-    if (!isPro && currentIndex >= visibleCount - 1) {
-      setShowUpgrade(true);
-      return;
-    }
-    setCurrentIndex((prev) => Math.min(prev + 1, (isPro ? allBlurbs.length : visibleCount) - 1));
+    setCurrentIndex((prev) => Math.min(prev + 1, allBlurbs.length - 1));
   };
 
   const goPrev = () => {
-    setShowUpgrade(false);
     setCurrentIndex((prev) => Math.max(prev - 1, 0));
   };
 
@@ -81,9 +55,7 @@ export function SwipeStack({ digest, spoilerFree, isPro = false }: SwipeStackPro
       {/* Card area */}
       <div className="flex-1 flex items-start justify-center px-2">
         <div className="w-full max-w-md">
-          {showUpgrade && !isPro ? (
-            <UpgradeCard remainingCount={lockedCount} variant="swipe" />
-          ) : currentBlurb ? (
+          {currentBlurb ? (
             <SwipeCard
               key={currentBlurb.id}
               blurb={currentBlurb}
@@ -92,7 +64,6 @@ export function SwipeStack({ digest, spoilerFree, isPro = false }: SwipeStackPro
               onNext={goNext}
               onMarkKnown={markKnown}
               isKnown={knownSet.has(currentIndex)}
-              proLevel={getProLevel(currentIndex, isPro)}
             />
           ) : null}
         </div>
@@ -101,18 +72,15 @@ export function SwipeStack({ digest, spoilerFree, isPro = false }: SwipeStackPro
       {/* Navigation */}
       <div className="mt-4">
         <ProgressDots
-          total={isPro ? allBlurbs.length : visibleCount}
+          total={allBlurbs.length}
           current={currentIndex}
           known={knownSet}
-          onSelect={(i) => {
-            setShowUpgrade(false);
-            setCurrentIndex(i);
-          }}
+          onSelect={setCurrentIndex}
         />
         <div className="flex items-center justify-center gap-4 pb-4">
           <button
             onClick={goPrev}
-            disabled={currentIndex === 0 && !showUpgrade}
+            disabled={currentIndex === 0}
             className="rounded-full bg-warm-50 p-2 text-warm-700 hover:bg-warm-100 disabled:opacity-30 transition-colors"
           >
             <ChevronLeft className="h-5 w-5" />
@@ -122,15 +90,15 @@ export function SwipeStack({ digest, spoilerFree, isPro = false }: SwipeStackPro
           </span>
           <button
             onClick={goNext}
-            disabled={showUpgrade || (isPro && currentIndex === allBlurbs.length - 1)}
+            disabled={currentIndex === allBlurbs.length - 1}
             className="rounded-full bg-warm-50 p-2 text-warm-700 hover:bg-warm-100 disabled:opacity-30 transition-colors"
           >
             <ChevronRight className="h-5 w-5" />
           </button>
         </div>
 
-        {/* Ad below navigation (free users only) */}
-        {!isPro && <AdBanner />}
+        {/* Ad below navigation */}
+        <AdBanner />
       </div>
     </div>
   );
