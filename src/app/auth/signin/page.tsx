@@ -1,13 +1,22 @@
 'use client';
 
-import { signIn } from 'next-auth/react';
-import { useState } from 'react';
+import { signIn, getProviders } from 'next-auth/react';
+import { useEffect, useState } from 'react';
 import { Loader2, Mail } from 'lucide-react';
 
 export default function SignInPage() {
   const [email, setEmail] = useState('');
   const [emailSent, setEmailSent] = useState(false);
   const [loading, setLoading] = useState(false);
+  // Magic link is only offered when the email provider is configured
+  // (it needs the database adapter, which is off while Supabase is down)
+  const [hasEmailProvider, setHasEmailProvider] = useState(false);
+
+  useEffect(() => {
+    getProviders().then((providers) => {
+      setHasEmailProvider(Boolean(providers?.email));
+    });
+  }, []);
 
   const handleEmailSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -58,6 +67,9 @@ export default function SignInPage() {
             Continue with Google
           </button>
 
+          {/* Email magic link (hidden while the email provider is unavailable) */}
+          {hasEmailProvider && (
+          <>
           {/* Divider */}
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
@@ -68,7 +80,6 @@ export default function SignInPage() {
             </div>
           </div>
 
-          {/* Email magic link */}
           {emailSent ? (
             <div className="rounded-xl bg-green-50 border border-green-200 p-4 text-center">
               <Mail className="h-8 w-8 text-green-600 mx-auto mb-2" />
@@ -107,6 +118,8 @@ export default function SignInPage() {
                 Send magic link
               </button>
             </form>
+          )}
+          </>
           )}
         </div>
 

@@ -6,20 +6,27 @@ import { getServerSession } from 'next-auth';
 
 let _authOptions: NextAuthOptions | null = null;
 
+/**
+ * SUPABASE_DISABLED=1 runs auth without the database: Google-only,
+ * pure-JWT sessions (user id = Google account id). Magic-link sign-in
+ * is unavailable in this mode because verification tokens live in the
+ * adapter. Remove the flag once a Supabase project is configured.
+ */
+const supabaseDisabled = process.env.SUPABASE_DISABLED === '1';
+
 export function getAuthOptions(): NextAuthOptions {
   if (_authOptions) return _authOptions;
 
-  _authOptions = {
-    adapter: SupabaseAdapter({
-      url: process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      secret: process.env.SUPABASE_SERVICE_ROLE_KEY!,
+  const providers: NextAuthOptions['providers'] = [
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
+  ];
 
-    providers: [
-      GoogleProvider({
-        clientId: process.env.GOOGLE_CLIENT_ID!,
-        clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-      }),
+  if (!supabaseDisabled) {
+    // EmailProvider needs the adapter for verification tokens
+    providers.push(
       EmailProvider({
         server: {
           host: 'smtp.resend.com',
@@ -30,8 +37,21 @@ export function getAuthOptions(): NextAuthOptions {
           },
         },
         from: process.env.RESEND_FROM_EMAIL || 'noreply@sportingchance.app',
-      }),
-    ],
+      })
+    );
+  }
+
+  _authOptions = {
+    ...(supabaseDisabled
+      ? {}
+      : {
+          adapter: SupabaseAdapter({
+            url: process.env.NEXT_PUBLIC_SUPABASE_URL!,
+            secret: process.env.SUPABASE_SERVICE_ROLE_KEY!,
+          }),
+        }),
+
+    providers,
 
     session: {
       strategy: 'jwt',
@@ -41,6 +61,9 @@ export function getAuthOptions(): NextAuthOptions {
       async jwt({ token, user }) {
         if (user) {
           token.id = user.id;
+        } else if (!token.id && token.sub) {
+          // Adapterless mode: fall back to the provider account id
+          token.id = token.sub;
         }
         return token;
       },
