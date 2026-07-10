@@ -131,9 +131,23 @@ export async function generateDrillDownV2(
   const prompt = buildDrillDownPromptV2(blurbSummary, blurbSport, languageMode);
 
   const anthropic = getClient();
-  const message = await callWithRetry(() => createMessage(anthropic, prompt, 8000));
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let parsed: any = {};
 
-  const parsed = JSON.parse(extractJSON(getResponseText(message)));
+  // The model occasionally returns the JSON with empty fields; regenerate
+  // once rather than serving a hollow drill-down.
+  for (let attempt = 0; attempt < 2; attempt++) {
+    const message = await callWithRetry(() => createMessage(anthropic, prompt, 8000));
+    parsed = JSON.parse(extractJSON(getResponseText(message)));
+    const complete =
+      (parsed.fullStory || parsed.context) && parsed.plainLanguageExplainer;
+    if (complete) break;
+    console.warn(
+      `[drilldown] incomplete generation for ${blurbId} (attempt ${attempt + 1}), ` +
+      `missing: ${!parsed.fullStory && !parsed.context ? 'fullStory ' : ''}` +
+      `${!parsed.plainLanguageExplainer ? 'plainLanguageExplainer' : ''}`
+    );
+  }
 
   return {
     blurbId,

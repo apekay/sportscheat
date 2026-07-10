@@ -181,7 +181,8 @@ Provide a deeper briefing that prioritizes UNDERSTANDING over information:
    - Frame these as things a real person at a party might say
    - Answers should be confident but not arrogant
 
-Respond with valid JSON:
+Respond with valid JSON. EVERY field below is required — never omit a field
+and never return an empty string, object, or array for any of them:
 {
   "fullStory": "2-3 paragraph narrative...",
   "athleteBackground": "1 paragraph about the main person...",

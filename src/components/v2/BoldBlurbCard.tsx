@@ -163,17 +163,21 @@ export function BoldBlurbCard({ blurb, index, spoilerFree, proLevel = 'full' }: 
             </div>
           ) : drillDown ? (
             <div className="space-y-4">
-              <div>
-                <h4 className="text-sm font-serif font-bold text-warm-900 mb-1">The Full Story</h4>
-                <p className="text-sm text-warm-700 leading-relaxed whitespace-pre-line">
-                  {drillDown.fullStory}
-                </p>
-              </div>
+              {drillDown.fullStory && (
+                <div>
+                  <h4 className="text-sm font-serif font-bold text-warm-900 mb-1">The Full Story</h4>
+                  <p className="text-sm text-warm-700 leading-relaxed whitespace-pre-line">
+                    {drillDown.fullStory}
+                  </p>
+                </div>
+              )}
 
-              <div className="rounded-lg bg-green-50 border border-green-200 p-3">
-                <h4 className="text-xs font-bold text-green-800 mb-1">The Simple Version</h4>
-                <p className="text-sm text-green-900">{drillDown.plainLanguageExplainer}</p>
-              </div>
+              {drillDown.plainLanguageExplainer && (
+                <div className="rounded-lg bg-green-50 border border-green-200 p-3">
+                  <h4 className="text-xs font-bold text-green-800 mb-1">The Simple Version</h4>
+                  <p className="text-sm text-green-900">{drillDown.plainLanguageExplainer}</p>
+                </div>
+              )}
 
               {drillDown.keyStats?.length > 0 && (
                 <div>

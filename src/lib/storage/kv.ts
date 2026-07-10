@@ -1,5 +1,5 @@
 import { Redis } from '@upstash/redis';
-import { DailyDigestV2 } from '@/types/v1.1';
+import { DailyDigestV2, DrillDownV2 } from '@/types/v1.1';
 import { Subscriber, CachedDigest } from '@/types/v2';
 import { todayString } from '@/lib/utils';
 
@@ -47,6 +47,36 @@ function yesterdayString(): string {
 
 export async function getYesterdayDigest(): Promise<DailyDigestV2 | null> {
   return getDigest(yesterdayString());
+}
+
+// ---- Drill-down storage ----
+// Drill-downs are expensive (~30s of generation); cache per blurb so only
+// the first reader of each story pays for it.
+
+const DRILLDOWN_PREFIX = 'drilldown';
+const DRILLDOWN_TTL = 60 * 60 * 48; // 48 hours, same horizon as digests
+
+export async function saveDrillDown(
+  blurbId: string,
+  lang: string,
+  drillDown: DrillDownV2
+): Promise<void> {
+  const redis = getRedis();
+  await redis.set(
+    `${DRILLDOWN_PREFIX}:${blurbId}:${lang}`,
+    JSON.stringify(drillDown),
+    { ex: DRILLDOWN_TTL }
+  );
+}
+
+export async function getDrillDown(
+  blurbId: string,
+  lang: string
+): Promise<DrillDownV2 | null> {
+  const redis = getRedis();
+  const raw = await redis.get<string>(`${DRILLDOWN_PREFIX}:${blurbId}:${lang}`);
+  if (!raw) return null;
+  return typeof raw === 'string' ? JSON.parse(raw) : raw;
 }
 
 // ---- Refresh rate limiting ----
