@@ -1,5 +1,11 @@
 import { NextResponse } from 'next/server';
-import { canRefresh, markRefreshed, saveDigest } from '@/lib/storage/kv';
+import {
+  canRefresh,
+  markRefreshed,
+  saveDigest,
+  acquireGenerationLock,
+  releaseGenerationLock,
+} from '@/lib/storage/kv';
 import { aggregateSportsData } from '@/lib/data/aggregate-v1.1';
 import { generateDailyDigestV2 } from '@/lib/ai/claude-v1.1';
 import { todayString } from '@/lib/utils';
@@ -24,16 +30,29 @@ export async function POST(request: Request) {
       );
     }
 
-    const date = todayString();
-    console.log(`[v2/refresh] Regenerating digest for ${date}...`);
+    // Don't stack a refresh on top of an in-flight generation
+    const gotLock = await acquireGenerationLock();
+    if (!gotLock) {
+      return NextResponse.json(
+        { status: 'generating' },
+        { status: 202, headers: { 'Retry-After': '20', 'Cache-Control': 'no-store' } }
+      );
+    }
 
-    const rawData = await aggregateSportsData();
-    const digest = await generateDailyDigestV2(rawData, lang);
+    try {
+      const date = todayString();
+      console.log(`[v2/refresh] Regenerating digest for ${date}...`);
 
-    await saveDigest(date, digest);
-    await markRefreshed(ip);
+      const rawData = await aggregateSportsData();
+      const digest = await generateDailyDigestV2(rawData, lang);
 
-    return NextResponse.json(digest);
+      await saveDigest(date, digest);
+      await markRefreshed(ip);
+
+      return NextResponse.json(digest);
+    } finally {
+      await releaseGenerationLock().catch(() => {});
+    }
   } catch (error) {
     console.error('[v2/refresh] Failed:', error);
     return NextResponse.json(

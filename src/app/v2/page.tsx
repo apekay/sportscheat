@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Newspaper, Layers } from 'lucide-react';
 import { AdBanner } from '@/components/ads/AdBanner';
+import { CostTicker } from '@/components/v2/CostTicker';
 import { trackViewModeSelected } from '@/lib/analytics/gtag';
 
 export default function V2Picker() {
@@ -98,6 +99,9 @@ export default function V2Picker() {
       <p className="mt-4 text-xs text-warm-300 text-center">
         You can switch anytime from the header.
       </p>
+      <div className="mt-2">
+        <CostTicker />
+      </div>
     </div>
   );
 }

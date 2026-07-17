@@ -2,6 +2,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import { RawSportsData, DailyDigest, DrillDown, QuizQuestion } from '@/types';
 import { buildDigestPrompt, buildDrillDownPrompt, buildQuizPrompt } from './prompts';
 import { generateId, todayString } from '@/lib/utils';
+import { recordUsage } from './cost';
 
 // Lazy-initialize the client so env vars are available at call time
 // Uses SPORTING_CHANCE_ANTHROPIC_KEY to avoid conflict with system-level ANTHROPIC_API_KEY
@@ -17,16 +18,18 @@ function getClient(): Anthropic {
 
 const MODEL = 'claude-sonnet-5';
 
-function createMessage(
+async function createMessage(
   anthropic: Anthropic,
   prompt: string,
   maxTokens: number
 ): Promise<Anthropic.Message> {
-  return anthropic.messages.create({
+  const message = await anthropic.messages.create({
     model: MODEL,
     max_tokens: maxTokens,
     messages: [{ role: 'user', content: prompt }],
   });
+  recordUsage(message);
+  return message;
 }
 
 function getResponseText(message: Anthropic.Message): string {

@@ -31,13 +31,29 @@ Anthropic API (`claude-sonnet-5`) · ESPN public APIs · Vercel (cron).
    aggregates ESPN scoreboards/news (`src/lib/data/`), generates the digest
    via `generateDailyDigestV2` (`src/lib/ai/claude-v1.1.ts`), and caches it
    in Redis (`src/lib/storage/kv.ts`, key `digest:{date}`, 48h TTL).
-2. `/api/v2/digest` serves cache → yesterday-fallback → live generation.
+2. `/api/v2/digest` serves cache → stale fallback (up to 3 days back;
+   digest TTL is 7 days so a missed cron never blanks the site) → live
+   generation. Live generation is guarded by a Redis lock
+   (`digest:generating`, 5-min TTL, `kv.ts`): the first cache-miss request
+   generates, concurrent ones get `202 {status:'generating'}` and the
+   clients poll every 20s showing a "being written" state. Without the
+   lock, N concurrent misses ran N parallel generations (~$0.20 each —
+   this burned ~$1.60 in minutes during testing on 2026-07-17).
 3. `/api/v2/refresh` is a user-triggered regeneration, rate-limited to
-   1/hour per user key.
+   1/hour per user key and behind the same generation lock (202 if held).
+   `/api/v2/generate` (cron) also takes the lock and skips if held.
 4. `/api/v1.1/drilldown` ("Go deeper") generates per-story deep dives,
    cached in Redis per blurb+language (48h) — first reader pays ~30s,
    everyone after gets ~30ms. It validates the model output and regenerates
    once if key fields come back empty.
+5. **Cost transparency (2026-07-10):** every Anthropic call is metered —
+   `src/lib/ai/cost.ts` reads `message.usage` and prices at Sonnet 5
+   standard rates ($3/$15 per MTok), accumulating into a Redis
+   integer-microdollar counter (`costs:total-microdollars`, `kv.ts`).
+   `/api/v2/costs` serves `{totalUsd}`; `CostTicker` renders "Total
+   cost to serve this site to everyone, ever: $X.XX" in the footer of
+   `/v2`, `/v2/bold`, and `/v2/swipe`. Recording is fire-and-forget so a
+   Redis failure can't break generation.
 
 **Model:** `claude-sonnet-5`, plain `messages.create` with a refusal guard
 (`src/lib/ai/claude-v1.1.ts` and legacy `claude.ts`). We tried
@@ -83,11 +99,14 @@ as Tailwind utilities (`warm-*`, `editorial-*`, `invert-*`, `on-ink`,
 
 - `npm run dev` (port 3000), `npm run lint`, `npm run build`. Always run
   from the repo root.
-- `.env.local` needs: `SPORTING_CHANCE_ANTHROPIC_KEY` (or `ANTHROPIC_API_KEY`),
-  `UPSTASH_REDIS_REST_URL/TOKEN`, `CRON_SECRET`, `NEXT_PUBLIC_GOOGLE_ADS_ID`.
-  The `SUPABASE_*`, `STRIPE_*`, `NEXTAUTH_*`, `GOOGLE_CLIENT_*`,
-  `RESEND_*`, and `SUPABASE_DISABLED` entries are **unused** since the
-  scrap-payments commit (the old Supabase project is deleted anyway).
+- `.env.local` needs: `SPORTSCHEAT_ANTHROPIC_KEY` (or
+  `SPORTING_CHANCE_ANTHROPIC_KEY`/`ANTHROPIC_API_KEY`),
+  `UPSTASH_REDIS_REST_URL/TOKEN`, `NEXT_PUBLIC_ADSENSE_CLIENT`.
+  `CRON_SECRET` lives only on Vercel (unset locally, so `/api/v2/generate`
+  is open in dev). The dead `SUPABASE_*`, `STRIPE_*`, `NEXTAUTH_*`, and
+  `GOOGLE_CLIENT_*` secrets were **deleted from `.env.local` 2026-07-10**;
+  mint fresh keys from each dashboard if auth/payments ever return. They
+  may still linger in Vercel's env settings — remove them there too.
 - Long routes declare `maxDuration = 300` (live generation runs ~1.5–2 min;
   requires Vercel Pro). Keep that on any new route that calls the model.
 - Digest dates are `YYYY-MM-DD` strings — parse with
@@ -95,6 +114,11 @@ as Tailwind utilities (`warm-*`, `editorial-*`, `invert-*`, `on-ink`,
 
 ## Gotchas
 
+- **Local dev and prod share ONE Upstash Redis.** Local generations are
+  served to production visitors and vice versa (this is also why prod
+  "worked" 07-09→07-12 despite its cron never landing a digest — local
+  sessions were feeding the shared cache). Local testing writes prod
+  data; be deliberate. Splitting into two Upstash DBs is an open thread.
 - `.claude/worktrees/` holds old Claude worktrees (one dirty with
   uncommitted Taboola work). They're excluded from git/tsconfig/eslint —
   **never `cd` into them and run npm**; npm resolves their package.json and
@@ -124,13 +148,39 @@ declined to execute; if marketing is revisited, plan a disclosed approach.
 | 2026-07-09 | Fast-reading base design + Paper/Wire/Jumbo skins (token system) |
 | 2026-07-10 | Drill-downs: validate+retry incomplete generations, Redis cache per blurb |
 | 2026-07-10 | **Scrapped auth, payments, paywall entirely — fully open, ads only** (revert point: `91934ef`) |
+| 2026-07-10 | Public cost counter: metered Anthropic spend in Redis, `/api/v2/costs` + footer `CostTicker`; purged dead auth/payment secrets from `.env.local` |
+| 2026-07-12 | Ads: Taboola → AdSense Auto ads → **Adsterra** (permissive, non-Google) in one cycle; env-gated Social Bar/Popunder zone scripts, AdSense fully removed |
+| 2026-07-17 | **Prod outage diagnosed** ("site stopped working" since ~07-12): repo was 15 commits ahead of origin — Vercel still served the July-9 Stripe-paywall build with login pointing at the deleted Supabase project, its cron generations never landed a digest, and the 07-10 digest's 48h TTL expired 07-12 leaving live-generation (which times out on Vercel) as the only path. Fix: pushed everything; added generation lock, 7-day TTL, 3-day stale fallback, 202+polling UX |
 
 ## Open threads for next session
 
-- Replace ad placeholders with real AdSense/Taboola units (there's dormant
-  Taboola work in the dirty `.claude` worktree `naughty-tereshkova-a98730`).
-- Consider deleting the dead v1 surfaces and pruning unused env entries.
+- Ads (2026-07-12): **Adsterra — permissive non-Google network.** Ad-system
+  history: Taboola ported → dropped; AdSense Auto ads wired → dropped
+  ("not from google"). Research: Adsterra and PropellerAds/Monetag are the
+  only reputable no-minimum instant-approval networks; Media.net needs
+  approval+traffic; Ezoic runs on Google AdX. Chose Adsterra (5–10 min
+  approval, all formats, $5 Paxum/$25 PayPal payout). Code side is done:
+  `layout.tsx` loads two env-gated zone scripts —
+  `NEXT_PUBLIC_ADSTERRA_SOCIALBAR_SRC` (Social Bar: floating bottom bar +
+  interstitials, the site-wide "auto ads" equivalent) and
+  `NEXT_PUBLIC_ADSTERRA_POPUNDER_SRC` (optional, most aggressive) — inert
+  until set. `AdBanner`/`AdUnit` are dev-only layout markers now (no
+  AdSense left; `NEXT_PUBLIC_ADSENSE_CLIENT` removed, `public/ads.txt`
+  google line removed). **Aaron must (Claude can't create accounts):**
+  sign up at adsterra.com as a publisher, add sportingchance.app, create a
+  Social Bar zone (+ Popunder if wanted), copy each zone's GET CODE script
+  URL into the env vars (locally + Vercel), and paste their ads.txt lines
+  into `public/ads.txt`. Expect lower RPMs and flashier ad creatives than
+  AdSense — the price of permissiveness. The `naughty-tereshkova-a98730`
+  worktree is superseded and can be deleted.
+- Consider deleting the dead v1 surfaces (local env entries are now pruned).
 - Distribution (`/api/v2/subscribe` + `src/lib/distribution/`) exists but
   the daily send isn't scheduled — only digest generation is cron'd.
-- Deploy state on Vercel unverified this cycle (env vars there still
-  reference the removed auth/payments stack).
+- **Vercel dashboard checks Aaron must do** (Claude has no access):
+  (1) confirm the post-push deploy went live; (2) check cron logs for
+  `/api/v2/generate` — if runs die at 60s the plan can't honor
+  `maxDuration=300` (needs Pro/Fluid) and generation will never finish
+  server-side; (3) delete the dead `SUPABASE_*`/`STRIPE_*`/`NEXTAUTH_*`/
+  `GOOGLE_*`/`NEXT_PUBLIC_ADSENSE_CLIENT` env vars; (4) confirm an
+  Anthropic key env var exists there (`SPORTSCHEAT_ANTHROPIC_KEY`).
+- Consider a second Upstash DB so local dev stops writing prod data.

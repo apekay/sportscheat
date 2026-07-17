@@ -1,4 +1,4 @@
-import { getLatestDigest, getYesterdayDigest } from '@/lib/storage/kv';
+import { getLatestDigest, getRecentDigest } from '@/lib/storage/kv';
 import SwipePageClient from './SwipePageClient';
 
 // Revalidate every 30 minutes — Vercel serves cached HTML from edge
@@ -8,7 +8,7 @@ export default async function SwipePage() {
   let initialDigest = null;
   try {
     initialDigest = await getLatestDigest();
-    if (!initialDigest) initialDigest = await getYesterdayDigest();
+    if (!initialDigest) initialDigest = await getRecentDigest(3);
   } catch {
     // Redis unavailable — client will fetch as fallback
   }

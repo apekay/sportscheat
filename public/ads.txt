@@ -1,1 +1,3 @@
-google.com, pub-2115685134385061, DIRECT, f08c47fec0942fa0
+# Adsterra: after creating the account, paste the ads.txt lines from
+# the publisher dashboard (Websites -> ads.txt) below. The old Google
+# AdSense line was removed 2026-07-12 when the site moved off Google ads.

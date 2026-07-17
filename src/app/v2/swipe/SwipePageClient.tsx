@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { DailyDigestV2 } from '@/types/v1.1';
 import { V2Header } from '@/components/v2/V2Header';
 import { SwipeStack } from '@/components/v2/SwipeStack';
+import { CostTicker } from '@/components/v2/CostTicker';
 import { trackDigestLoaded, trackDigestRefreshed } from '@/lib/analytics/gtag';
 import { Loader2 } from 'lucide-react';
 
@@ -14,6 +15,7 @@ interface Props {
 export default function SwipePageClient({ initialDigest }: Props) {
   const [digest, setDigest] = useState<DailyDigestV2 | null>(initialDigest);
   const [loading, setLoading] = useState(!initialDigest);
+  const [writing, setWriting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [spoilerFree, setSpoilerFree] = useState(true);
 
@@ -22,11 +24,20 @@ export default function SwipePageClient({ initialDigest }: Props) {
     setError(null);
     try {
       const res = await fetch('/api/v2/digest');
+      // 202: today's digest is being generated right now — poll until it lands
+      if (res.status === 202) {
+        setWriting(true);
+        setLoading(false);
+        window.setTimeout(fetchDigest, 20_000);
+        return;
+      }
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data: DailyDigestV2 = await res.json();
+      setWriting(false);
       setDigest(data);
       trackDigestLoaded(data.blurbs?.length ?? 0);
     } catch (err) {
+      setWriting(false);
       setError(err instanceof Error ? err.message : 'Failed to load');
     } finally {
       setLoading(false);
@@ -40,6 +51,11 @@ export default function SwipePageClient({ initialDigest }: Props) {
       const res = await fetch('/api/v2/refresh', { method: 'POST' });
       if (res.status === 429) {
         setError('Refresh available once per hour. Try again later.');
+        setLoading(false);
+        return;
+      }
+      if (res.status === 202) {
+        setError('A fresh digest is already being written — it will appear shortly.');
         setLoading(false);
         return;
       }
@@ -74,10 +90,14 @@ export default function SwipePageClient({ initialDigest }: Props) {
       />
 
       <main className="mx-auto max-w-2xl px-4 py-4">
-        {loading && !digest && (
+        {(loading || writing) && !digest && (
           <div className="flex flex-col items-center justify-center py-20">
             <Loader2 className="h-10 w-10 animate-spin text-warm-300" />
-            <p className="mt-4 text-sm text-warm-500">Loading your cheat sheet...</p>
+            <p className="mt-4 text-sm text-warm-500">
+              {writing
+                ? 'Today’s cheat sheet is being written — about two minutes. This page will refresh itself.'
+                : 'Loading your cheat sheet...'}
+            </p>
           </div>
         )}
 
@@ -128,10 +148,11 @@ export default function SwipePageClient({ initialDigest }: Props) {
               </p>
             </div>
 
-            <div className="py-4 text-center">
+            <div className="py-4 text-center space-y-1">
               <p className="text-xs text-warm-300">
                 We belong in the conversation.
               </p>
+              <CostTicker />
             </div>
           </>
         )}

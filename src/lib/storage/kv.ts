@@ -15,7 +15,8 @@ function getRedis(): Redis {
 // ---- Digest storage ----
 
 const DIGEST_PREFIX = 'digest';
-const DIGEST_TTL = 60 * 60 * 48; // 48 hours
+// 7 days: a stale digest beats a blank site when the daily cron misses.
+const DIGEST_TTL = 60 * 60 * 24 * 7;
 
 export async function saveDigest(date: string, digest: DailyDigestV2): Promise<void> {
   const redis = getRedis();
@@ -39,14 +40,39 @@ export async function getLatestDigest(): Promise<DailyDigestV2 | null> {
   return getDigest(todayString());
 }
 
-function yesterdayString(): string {
+function daysAgoString(daysBack: number): string {
   const d = new Date();
-  d.setDate(d.getDate() - 1);
+  d.setUTCDate(d.getUTCDate() - daysBack);
   return d.toISOString().split('T')[0];
 }
 
-export async function getYesterdayDigest(): Promise<DailyDigestV2 | null> {
-  return getDigest(yesterdayString());
+/** Newest digest from the last `maxDaysBack` days (excluding today). */
+export async function getRecentDigest(
+  maxDaysBack: number
+): Promise<DailyDigestV2 | null> {
+  for (let back = 1; back <= maxDaysBack; back++) {
+    const digest = await getDigest(daysAgoString(back));
+    if (digest) return digest;
+  }
+  return null;
+}
+
+// ---- Generation lock ----
+// Live digest generation takes ~2 min; without a lock, every concurrent
+// cache-miss request starts its own generation (real API dollars each).
+
+const GEN_LOCK_KEY = 'digest:generating';
+const GEN_LOCK_TTL = 60 * 5; // covers one generation, self-heals if a run dies
+
+export async function acquireGenerationLock(): Promise<boolean> {
+  const redis = getRedis();
+  const res = await redis.set(GEN_LOCK_KEY, '1', { nx: true, ex: GEN_LOCK_TTL });
+  return res === 'OK';
+}
+
+export async function releaseGenerationLock(): Promise<void> {
+  const redis = getRedis();
+  await redis.del(GEN_LOCK_KEY);
 }
 
 // ---- Drill-down storage ----
@@ -77,6 +103,23 @@ export async function getDrillDown(
   const raw = await redis.get<string>(`${DRILLDOWN_PREFIX}:${blurbId}:${lang}`);
   if (!raw) return null;
   return typeof raw === 'string' ? JSON.parse(raw) : raw;
+}
+
+// ---- Cost ledger ----
+// Running total of Anthropic API spend across all visitors, stored as
+// integer microdollars so INCRBY stays exact (no float drift).
+
+const COST_KEY = 'costs:total-microdollars';
+
+export async function addCost(usd: number): Promise<void> {
+  const redis = getRedis();
+  await redis.incrby(COST_KEY, Math.round(usd * 1_000_000));
+}
+
+export async function getTotalCost(): Promise<number> {
+  const redis = getRedis();
+  const micro = await redis.get<number>(COST_KEY);
+  return (micro ?? 0) / 1_000_000;
 }
 
 // ---- Refresh rate limiting ----

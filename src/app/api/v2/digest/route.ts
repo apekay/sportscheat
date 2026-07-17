@@ -1,5 +1,11 @@
 import { NextResponse } from 'next/server';
-import { getLatestDigest, getYesterdayDigest, saveDigest } from '@/lib/storage/kv';
+import {
+  getLatestDigest,
+  getRecentDigest,
+  saveDigest,
+  acquireGenerationLock,
+  releaseGenerationLock,
+} from '@/lib/storage/kv';
 import { aggregateSportsData } from '@/lib/data/aggregate-v1.1';
 import { generateDailyDigestV2 } from '@/lib/ai/claude-v1.1';
 import { todayString } from '@/lib/utils';
@@ -33,34 +39,52 @@ export async function GET(request: Request) {
       console.warn('[v2/digest] Redis read failed, continuing to fallbacks:', cacheErr);
     }
 
-    // 2. Try yesterday's digest as a quick fallback (still instant)
+    // 2. Recent digest as a quick fallback (up to 3 days stale, still
+    //    instant) — a missed cron shouldn't blank the site
     try {
-      const yesterday = await getYesterdayDigest();
-      if (yesterday) {
-        console.log('[v2/digest] Serving yesterday\'s digest as fallback');
-        return NextResponse.json(yesterday, {
-          headers: { 'X-Cache': 'YESTERDAY', ...cacheHeaders },
+      const recent = await getRecentDigest(3);
+      if (recent) {
+        console.log(`[v2/digest] Serving stale digest (${recent.date}) as fallback`);
+        return NextResponse.json(recent, {
+          headers: { 'X-Cache': 'STALE', ...cacheHeaders },
         });
       }
-    } catch (yesterdayErr) {
-      console.warn('[v2/digest] Yesterday fallback failed:', yesterdayErr);
+    } catch (staleErr) {
+      console.warn('[v2/digest] Stale fallback failed:', staleErr);
     }
 
-    // 3. Full cache miss — generate live (first visit before cron runs)
-    console.log('[v2/digest] Cache miss, generating live...');
-    const rawData = await aggregateSportsData();
-    const digest = await generateDailyDigestV2(rawData, lang);
+    // 3. Full cache miss — generate live, but only ONE request at a time.
+    //    Concurrent visitors get a 202 and the client polls until the
+    //    winner's digest lands in Redis.
+    const gotLock = await acquireGenerationLock();
+    if (!gotLock) {
+      return NextResponse.json(
+        { status: 'generating' },
+        {
+          status: 202,
+          headers: { 'Retry-After': '20', 'Cache-Control': 'no-store' },
+        }
+      );
+    }
 
-    // Save to cache for subsequent requests (non-blocking, don't crash if Redis fails)
     try {
-      await saveDigest(todayString(), digest);
-    } catch (saveErr) {
-      console.warn('[v2/digest] Failed to save to cache:', saveErr);
-    }
+      console.log('[v2/digest] Cache miss, generating live...');
+      const rawData = await aggregateSportsData();
+      const digest = await generateDailyDigestV2(rawData, lang);
 
-    return NextResponse.json(digest, {
-      headers: { 'X-Cache': 'MISS', ...cacheHeaders },
-    });
+      // Save to cache for subsequent requests (non-blocking, don't crash if Redis fails)
+      try {
+        await saveDigest(todayString(), digest);
+      } catch (saveErr) {
+        console.warn('[v2/digest] Failed to save to cache:', saveErr);
+      }
+
+      return NextResponse.json(digest, {
+        headers: { 'X-Cache': 'MISS', ...cacheHeaders },
+      });
+    } finally {
+      await releaseGenerationLock().catch(() => {});
+    }
   } catch (error) {
     console.error('[v2/digest] Failed:', error);
     return NextResponse.json(

@@ -12,6 +12,7 @@ import {
 } from './prompts-v1.1';
 import { RawSportsDataV2 } from '@/lib/data/aggregate-v1.1';
 import { generateId, todayString } from '@/lib/utils';
+import { recordUsage } from './cost';
 
 function getClient(): Anthropic {
   const apiKey = process.env.SPORTING_CHANCE_ANTHROPIC_KEY || process.env.SPORTSCHEAT_ANTHROPIC_KEY || process.env.ANTHROPIC_API_KEY;
@@ -24,16 +25,18 @@ function getClient(): Anthropic {
 const MODEL = 'claude-sonnet-5';
 const MAX_RETRIES = 3;
 
-function createMessage(
+async function createMessage(
   anthropic: Anthropic,
   prompt: string,
   maxTokens: number
 ): Promise<Anthropic.Message> {
-  return anthropic.messages.create({
+  const message = await anthropic.messages.create({
     model: MODEL,
     max_tokens: maxTokens,
     messages: [{ role: 'user', content: prompt }],
   });
+  recordUsage(message);
+  return message;
 }
 
 function getResponseText(message: Anthropic.Message): string {

@@ -8,11 +8,10 @@ interface AdBannerProps {
   className?: string;
 }
 
-// Default slot — replace with your real ad unit IDs
-const DEFAULT_SLOT = '1234567890';
-
+// Dev-only layout markers. Production ads are Adsterra's site-wide units
+// (Social Bar / Popunder), injected by the zone scripts in layout.tsx.
 export function AdBanner({
-  slot = DEFAULT_SLOT,
+  slot,
   variant = 'inline',
   className = '',
 }: AdBannerProps) {
