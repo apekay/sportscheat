@@ -176,11 +176,17 @@ declined to execute; if marketing is revisited, plan a disclosed approach.
 - Consider deleting the dead v1 surfaces (local env entries are now pruned).
 - Distribution (`/api/v2/subscribe` + `src/lib/distribution/`) exists but
   the daily send isn't scheduled — only digest generation is cron'd.
-- **Vercel dashboard checks Aaron must do** (Claude has no access):
-  (1) confirm the post-push deploy went live; (2) check cron logs for
-  `/api/v2/generate` — if runs die at 60s the plan can't honor
-  `maxDuration=300` (needs Pro/Fluid) and generation will never finish
-  server-side; (3) delete the dead `SUPABASE_*`/`STRIPE_*`/`NEXTAUTH_*`/
-  `GOOGLE_*`/`NEXT_PUBLIC_ADSENSE_CLIENT` env vars; (4) confirm an
-  Anthropic key env var exists there (`SPORTSCHEAT_ANTHROPIC_KEY`).
+- **Vercel state (2026-07-17, resolved via authed CLI + dashboard):**
+  current code deployed to prod by `vercel --prod` (CLI re-authed via
+  device flow, token on this machine); 25 dead env vars deleted, 5 live
+  ones kept (`SPORTSCHEAT_ANTHROPIC_KEY`, `UPSTASH_*`×2, `CRON_SECRET`,
+  `RESEND_API_KEY`); cron `/api/v2/generate` 10:00 UTC registered +
+  enabled (Hobby = 1-hour flex window); Fluid compute on, so
+  `maxDuration=300` is honored on Hobby — a full 123s generation
+  completed on prod via `/api/v2/refresh` as proof. **Still open: the
+  project's Git repo is NOT connected** (that's why pushes never
+  deployed — prod ran the April 16 build until now). Connecting needs
+  the Vercel GitHub App installed from a browser logged into GitHub
+  (github.com/apps/vercel → install on `apekay`, then `vercel git
+  connect`). Until then, deploy with `vercel --prod`.
 - Consider a second Upstash DB so local dev stops writing prod data.
