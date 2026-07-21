@@ -1,12 +1,16 @@
 import { NextResponse } from 'next/server';
-import { getTotalCost } from '@/lib/storage/kv';
+import { getTotalCost, getTotalVisitors } from '@/lib/storage/kv';
 
-// GET /api/v2/costs — running total of Anthropic API spend, in USD
+// GET /api/v2/costs — running total of Anthropic API spend (USD) and
+// total unique visitors, for the public transparency footer
 export async function GET() {
   try {
-    const totalUsd = await getTotalCost();
+    const [totalUsd, totalVisitors] = await Promise.all([
+      getTotalCost(),
+      getTotalVisitors(),
+    ]);
     return NextResponse.json(
-      { totalUsd },
+      { totalUsd, totalVisitors },
       {
         headers: {
           'CDN-Cache-Control': 's-maxage=300, stale-while-revalidate=3600',

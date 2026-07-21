@@ -50,10 +50,12 @@ Anthropic API (`claude-sonnet-5`) · ESPN public APIs · Vercel (cron).
    `src/lib/ai/cost.ts` reads `message.usage` and prices at Sonnet 5
    standard rates ($3/$15 per MTok), accumulating into a Redis
    integer-microdollar counter (`costs:total-microdollars`, `kv.ts`).
-   `/api/v2/costs` serves `{totalUsd}`; `CostTicker` renders "Total
-   cost to serve this site to everyone, ever: $X.XX" in the footer of
-   `/v2`, `/v2/bold`, and `/v2/swipe`. Recording is fire-and-forget so a
-   Redis failure can't break generation.
+   `/api/v2/costs` serves `{totalUsd, totalVisitors}`; `CostTicker`
+   renders total + per-person cost ("Across N visitors, that's $Y per
+   person") in the footer of `/v2`, `/v2/bold`, and `/v2/swipe`.
+   Visitors are counted once per browser (localStorage `sc-visited` gates
+   a POST to `/api/v2/view` → Redis `views:total-visitors`). Recording is
+   fire-and-forget so a Redis failure can't break generation.
 
 **Model:** `claude-sonnet-5`, plain `messages.create` with a refusal guard
 (`src/lib/ai/claude-v1.1.ts` and legacy `claude.ts`). We tried
@@ -65,8 +67,10 @@ is sized generously because Sonnet 5's adaptive thinking counts toward it.
 - `/v2` — mode picker (choice persisted in `localStorage.sporting-chance-view`;
   `/` redirects here)
 - `/v2/swipe` — flash cards: flip for full story, "I got this" memorization
-  tracking, progress ticks
-- `/v2/bold` — headlines feed with expandable "Go deeper" drill-downs
+  tracking, progress ticks; topic filter chips restart the deck
+- `/v2/bold` — headlines feed: topic filter chips (`TopicTabs` +
+  `src/lib/topics.ts` sport→topic map), top-3 stories visible with a
+  "Show N more" expander (2026-07-21), expandable "Go deeper" drill-downs
 - `/v1.1` — legacy digest page (still works, shares the digest cache)
 - `/api/v2/subscribe` — email/sms/slack/discord digest distribution
   (`src/lib/distribution/`)
@@ -150,6 +154,7 @@ declined to execute; if marketing is revisited, plan a disclosed approach.
 | 2026-07-10 | **Scrapped auth, payments, paywall entirely — fully open, ads only** (revert point: `91934ef`) |
 | 2026-07-10 | Public cost counter: metered Anthropic spend in Redis, `/api/v2/costs` + footer `CostTicker`; purged dead auth/payment secrets from `.env.local` |
 | 2026-07-12 | Ads: Taboola → AdSense Auto ads → **Adsterra** (permissive, non-Google) in one cycle; env-gated Social Bar/Popunder zone scripts, AdSense fully removed |
+| 2026-07-21 | Feed: top-3 + "Show N more" expander, topic filter chips (both v2 surfaces); transparency: per-person cost line backed by a once-per-browser visitor counter |
 | 2026-07-17 | **Prod outage diagnosed** ("site stopped working" since ~07-12): repo was 15 commits ahead of origin — Vercel still served the July-9 Stripe-paywall build with login pointing at the deleted Supabase project, its cron generations never landed a digest, and the 07-10 digest's 48h TTL expired 07-12 leaving live-generation (which times out on Vercel) as the only path. Fix: pushed everything; added generation lock, 7-day TTL, 3-day stale fallback, 202+polling UX |
 
 ## Open threads for next session

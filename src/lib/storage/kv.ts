@@ -122,6 +122,22 @@ export async function getTotalCost(): Promise<number> {
   return (micro ?? 0) / 1_000_000;
 }
 
+// ---- Visitor counter ----
+// One increment per browser, ever (client gates on a localStorage flag).
+// Powers the "cost per person" line in the footer.
+
+const VISITORS_KEY = 'views:total-visitors';
+
+export async function incrementVisitors(): Promise<void> {
+  const redis = getRedis();
+  await redis.incr(VISITORS_KEY);
+}
+
+export async function getTotalVisitors(): Promise<number> {
+  const redis = getRedis();
+  return (await redis.get<number>(VISITORS_KEY)) ?? 0;
+}
+
 // ---- Refresh rate limiting ----
 
 const REFRESH_PREFIX = 'refresh';

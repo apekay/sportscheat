@@ -4,6 +4,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { DailyDigestV2 } from '@/types/v1.1';
 import { V2Header } from '@/components/v2/V2Header';
 import { SwipeStack } from '@/components/v2/SwipeStack';
+import { TopicTabs } from '@/components/v2/TopicTabs';
+import { topicForSport, topicsInBlurbs } from '@/lib/topics';
 import { CostTicker } from '@/components/v2/CostTicker';
 import { trackDigestLoaded, trackDigestRefreshed } from '@/lib/analytics/gtag';
 import { Loader2 } from 'lucide-react';
@@ -18,6 +20,7 @@ export default function SwipePageClient({ initialDigest }: Props) {
   const [writing, setWriting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [spoilerFree, setSpoilerFree] = useState(true);
+  const [topic, setTopic] = useState('all');
 
   const fetchDigest = useCallback(async () => {
     setLoading(true);
@@ -113,7 +116,29 @@ export default function SwipePageClient({ initialDigest }: Props) {
           </div>
         )}
 
-        {digest && <SwipeStack digest={digest} spoilerFree={spoilerFree} />}
+        {digest && (
+          <>
+            <TopicTabs
+              topics={topicsInBlurbs(digest.blurbs)}
+              selected={topic}
+              onSelect={setTopic}
+            />
+            <SwipeStack
+              key={topic} // restart the deck when the topic changes
+              digest={
+                topic === 'all'
+                  ? digest
+                  : {
+                      ...digest,
+                      blurbs: digest.blurbs.filter(
+                        (b) => topicForSport(b.sport).id === topic
+                      ),
+                    }
+              }
+              spoilerFree={spoilerFree}
+            />
+          </>
+        )}
 
         {digest && (
           <>
