@@ -170,14 +170,16 @@ declined to execute; if marketing is revisited, plan a disclosed approach.
   interstitials, the site-wide "auto ads" equivalent) and
   `NEXT_PUBLIC_ADSTERRA_POPUNDER_SRC` (optional, most aggressive) — inert
   until set. `AdBanner`/`AdUnit` are dev-only layout markers now (no
-  AdSense left; `NEXT_PUBLIC_ADSENSE_CLIENT` removed, `public/ads.txt`
-  google line removed). **Aaron must (Claude can't create accounts):**
-  sign up at adsterra.com as a publisher, add sportingchance.app, create a
-  Social Bar zone (+ Popunder if wanted), copy each zone's GET CODE script
-  URL into the env vars (locally + Vercel), and paste their ads.txt lines
-  into `public/ads.txt`. Expect lower RPMs and flashier ad creatives than
-  AdSense — the price of permissiveness. The `naughty-tereshkova-a98730`
-  worktree is superseded and can be deleted.
+  AdSense left). **LIVE as of 2026-07-21:** Aaron signed up (publisher
+  account `apekay`), site sportingchance.app = ID 5928373, category
+  Sport Streaming, adult ads OFF. Social Bar zone 30371408 is enabled in
+  prod via `NEXT_PUBLIC_ADSTERRA_SOCIALBAR_SRC` on Vercel; Popunder zone
+  30371409 exists but is deliberately NOT enabled (aggressive format —
+  its URL is in `.env.local` comments, one `vercel env add` from live).
+  Adsterra provides no ads.txt lines for this account type (direct
+  demand); `public/ads.txt` is a placeholder comment. Expect lower RPMs
+  and flashier creatives than AdSense — the price of permissiveness.
+  The `naughty-tereshkova-a98730` worktree is superseded, can be deleted.
 - Consider deleting the dead v1 surfaces (local env entries are now pruned).
 - Distribution (`/api/v2/subscribe` + `src/lib/distribution/`) exists but
   the daily send isn't scheduled — only digest generation is cron'd.

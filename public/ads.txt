@@ -1,3 +1,4 @@
-# Adsterra: after creating the account, paste the ads.txt lines from
-# the publisher dashboard (Websites -> ads.txt) below. The old Google
-# AdSense line was removed 2026-07-12 when the site moved off Google ads.
+# Ads served by Adsterra (site ID 5928373). Adsterra's demand is direct
+# and their dashboard provides no ads.txt lines for this account type —
+# add lines here if Adsterra ever emails them. Google AdSense line was
+# removed 2026-07-12 when the site moved off Google ads.
