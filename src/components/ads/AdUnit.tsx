@@ -1,10 +1,8 @@
 'use client';
 
 interface AdUnitProps {
-  /** Reserved for a future per-placement Adsterra banner zone. Today every
-      unit is a dev-only marker: site-wide ads (Social Bar / Popunder) are
-      injected globally by the zone scripts in layout.tsx, so in production
-      this renders nothing. */
+  /** Layout marker for a possible future ad placement. No ad network is
+      integrated — renders a dashed marker in dev, nothing in production. */
   slot?: string;
   format?: 'auto' | 'rectangle' | 'horizontal' | 'vertical';
   responsive?: boolean;
@@ -21,7 +19,7 @@ export function AdUnit({ className = '' }: AdUnitProps) {
       className={`flex items-center justify-center rounded-lg border-2 border-dashed border-warm-200 bg-warm-50 text-xs text-warm-300 ${className}`}
       style={{ minHeight: 90 }}
     >
-      Ad Placeholder (site-wide Adsterra units inject globally)
+      Ad Placeholder
     </div>
   );
 }

@@ -155,31 +155,27 @@ declined to execute; if marketing is revisited, plan a disclosed approach.
 | 2026-07-10 | Public cost counter: metered Anthropic spend in Redis, `/api/v2/costs` + footer `CostTicker`; purged dead auth/payment secrets from `.env.local` |
 | 2026-07-12 | Ads: Taboola → AdSense Auto ads → **Adsterra** (permissive, non-Google) in one cycle; env-gated Social Bar/Popunder zone scripts, AdSense fully removed |
 | 2026-07-21 | Feed: top-3 + "Show N more" expander, topic filter chips (both v2 surfaces); transparency: per-person cost line backed by a once-per-browser visitor counter |
+| 2026-07-21 | Adsterra went live (Social Bar, real ads served) and was **removed the same day** — creatives too trashy; site now runs with no ad network |
 | 2026-07-17 | **Prod outage diagnosed** ("site stopped working" since ~07-12): repo was 15 commits ahead of origin — Vercel still served the July-9 Stripe-paywall build with login pointing at the deleted Supabase project, its cron generations never landed a digest, and the 07-10 digest's 48h TTL expired 07-12 leaving live-generation (which times out on Vercel) as the only path. Fix: pushed everything; added generation lock, 7-day TTL, 3-day stale fallback, 202+polling UX |
 
 ## Open threads for next session
 
-- Ads (2026-07-12): **Adsterra — permissive non-Google network.** Ad-system
-  history: Taboola ported → dropped; AdSense Auto ads wired → dropped
-  ("not from google"). Research: Adsterra and PropellerAds/Monetag are the
-  only reputable no-minimum instant-approval networks; Media.net needs
-  approval+traffic; Ezoic runs on Google AdX. Chose Adsterra (5–10 min
-  approval, all formats, $5 Paxum/$25 PayPal payout). Code side is done:
-  `layout.tsx` loads two env-gated zone scripts —
-  `NEXT_PUBLIC_ADSTERRA_SOCIALBAR_SRC` (Social Bar: floating bottom bar +
-  interstitials, the site-wide "auto ads" equivalent) and
-  `NEXT_PUBLIC_ADSTERRA_POPUNDER_SRC` (optional, most aggressive) — inert
-  until set. `AdBanner`/`AdUnit` are dev-only layout markers now (no
-  AdSense left). **LIVE as of 2026-07-21:** Aaron signed up (publisher
-  account `apekay`), site sportingchance.app = ID 5928373, category
-  Sport Streaming, adult ads OFF. Social Bar zone 30371408 is enabled in
-  prod via `NEXT_PUBLIC_ADSTERRA_SOCIALBAR_SRC` on Vercel; Popunder zone
-  30371409 exists but is deliberately NOT enabled (aggressive format —
-  its URL is in `.env.local` comments, one `vercel env add` from live).
-  Adsterra provides no ads.txt lines for this account type (direct
-  demand); `public/ads.txt` is a placeholder comment. Expect lower RPMs
-  and flashier creatives than AdSense — the price of permissiveness.
-  The `naughty-tereshkova-a98730` worktree is superseded, can be deleted.
+- Ads (2026-07-21): **no ad network integrated.** Full history, all
+  removed by decision: Taboola (never launched) → AdSense Auto ads ("not
+  from google") → Adsterra, which went fully live on 2026-07-21 and was
+  torn out the same day ("those ads are terrible" — a VPN push ad was the
+  first creative served; downmarket creatives are inherent to the
+  permissive networks). The trilemma to remember before wiring ads again:
+  quality creatives / no approval barrier / non-Google — pick two.
+  Aaron's dormant Adsterra publisher account survives (login `apekay`,
+  site ID 5928373, Social Bar zone 30371408 + Popunder 30371409) if ever
+  wanted; zone URLs are in the dashboard under GET CODE. `AdBanner`/
+  `AdUnit` remain as dev-only layout markers (render nothing in prod).
+  Quality non-Google paths if revisited at real traffic: Media.net
+  (needs approval + US/UK traffic), Carbon/BuySellAds (curated,
+  ~10k+ pageviews), sports affiliate links, or a self-serve sponsor
+  slot. The `naughty-tereshkova-a98730` worktree is superseded, can be
+  deleted.
 - Consider deleting the dead v1 surfaces (local env entries are now pruned).
 - Distribution (`/api/v2/subscribe` + `src/lib/distribution/`) exists but
   the daily send isn't scheduled — only digest generation is cron'd.

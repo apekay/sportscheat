@@ -22,10 +22,6 @@ const lora = Lora({
 });
 
 const googleAdsId = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID;
-// Adsterra zone script URLs, copied per-zone from the publisher dashboard
-// ("GET CODE" on each ad unit). Inert until set.
-const adsterraSocialBarSrc = process.env.NEXT_PUBLIC_ADSTERRA_SOCIALBAR_SRC;
-const adsterraPopunderSrc = process.env.NEXT_PUBLIC_ADSTERRA_POPUNDER_SRC;
 
 export const metadata: Metadata = {
   title: "Sporting Chance — Your Daily Sports Briefing",
@@ -52,17 +48,6 @@ export default function RootLayout({
             __html: `try{var s=localStorage.getItem('sc-skin');if(s)document.documentElement.dataset.skin=s}catch(e){}`,
           }}
         />
-        {/* Adsterra (non-Google ad network, no approval gate). Social Bar
-            is the site-wide unit — floating bottom bar + interstitials,
-            their equivalent of auto/anchor ads. Popunder is the optional
-            max-permissive extra. Each renders only when its zone script
-            URL is present in env. */}
-        {adsterraSocialBarSrc && (
-          <Script src={adsterraSocialBarSrc} strategy="afterInteractive" />
-        )}
-        {adsterraPopunderSrc && (
-          <Script src={adsterraPopunderSrc} strategy="afterInteractive" />
-        )}
         <Providers>{children}</Providers>
         {googleAdsId && (
           <>

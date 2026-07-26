@@ -8,8 +8,8 @@ interface AdBannerProps {
   className?: string;
 }
 
-// Dev-only layout markers. Production ads are Adsterra's site-wide units
-// (Social Bar / Popunder), injected by the zone scripts in layout.tsx.
+// Dev-only layout markers for future ad placements. No ad network is
+// currently integrated; production renders nothing here.
 export function AdBanner({
   slot,
   variant = 'inline',
